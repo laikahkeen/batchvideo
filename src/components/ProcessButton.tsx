@@ -1,4 +1,5 @@
 import { Play, Download, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 import { processVideo, loadFFmpeg } from '../utils/ffmpeg';
 
@@ -92,11 +93,11 @@ const ProcessButton = () => {
   if (!hasFiles) return null;
 
   return (
-    <div className="sticky bottom-0 -mb-6 border-t border-gray-700 bg-gray-900/95 p-2 backdrop-blur-sm">
+    <div className="sticky bottom-0 -mb-6 border-t border-gray-300 bg-white/95 p-2 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/95">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 p-4">
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-gray-600 dark:text-gray-400">
           {allCompleted ? (
-            <span className="font-medium text-green-400">
+            <span className="font-medium text-green-500 dark:text-green-400">
               All videos processed! ({stats.completed}/{stats.total})
             </span>
           ) : (
@@ -109,26 +110,22 @@ const ProcessButton = () => {
         <div className="flex items-center gap-3">
           {allCompleted && (
             <>
-              <button onClick={handleDownloadAll} className="btn btn-secondary flex items-center gap-2">
+              <Button onClick={handleDownloadAll} variant="secondary">
                 <Download className="h-4 w-4" />
                 Download All
-              </button>
-              <button onClick={handleClearAll} className="btn btn-danger flex items-center gap-2">
+              </Button>
+              <Button onClick={handleClearAll} variant="destructive">
                 <Trash2 className="h-4 w-4" />
                 Clear All
-              </button>
+              </Button>
             </>
           )}
 
           {!allCompleted && (
-            <button
-              onClick={handleProcess}
-              disabled={isProcessing}
-              className="btn btn-primary flex items-center gap-2 px-8 py-3 text-lg"
-            >
+            <Button onClick={handleProcess} disabled={isProcessing} size="lg" className="px-8">
               <Play className="h-5 w-5" />
               {isProcessing ? 'Processing...' : 'Process Batch'}
-            </button>
+            </Button>
           )}
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { Upload, X, Palette } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 
 const LUTUpload = () => {
@@ -30,13 +31,15 @@ const LUTUpload = () => {
   return (
     <div className="card">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
+        <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
           <Palette className="h-5 w-5" />
           LUT (Optional)
         </h3>
       </div>
 
-      <p className="mb-4 text-sm text-gray-400">Upload a .cube LUT file to apply color grading to your videos</p>
+      <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+        Upload a .cube LUT file to apply color grading to your videos
+      </p>
 
       <input
         ref={fileInputRef}
@@ -48,31 +51,27 @@ const LUTUpload = () => {
       />
 
       {lutFile ? (
-        <div className="flex items-center justify-between rounded-lg bg-gray-900 p-4">
+        <div className="flex items-center justify-between rounded-lg bg-gray-100 p-4 dark:bg-gray-900">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-purple-500 to-pink-500">
               <Palette className="h-5 w-5 text-white" />
             </div>
             <div>
-              <p className="font-medium text-white">{lutFile.name}</p>
-              <p className="text-xs text-gray-400">{(lutFile.size / 1024).toFixed(1)} KB</p>
+              <p className="font-medium text-gray-900 dark:text-white">{lutFile.name}</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">{(lutFile.size / 1024).toFixed(1)} KB</p>
             </div>
           </div>
           {!isProcessing && (
-            <button onClick={handleRemove} className="btn btn-danger p-2" title="Remove LUT">
+            <Button onClick={handleRemove} variant="destructive" size="icon" title="Remove LUT">
               <X className="h-4 w-4" />
-            </button>
+            </Button>
           )}
         </div>
       ) : (
-        <button
-          onClick={handleClick}
-          disabled={isProcessing}
-          className="btn btn-secondary flex w-full items-center justify-center gap-2"
-        >
+        <Button onClick={handleClick} disabled={isProcessing} variant="secondary" className="w-full">
           <Upload className="h-4 w-4" />
           Upload LUT File (.cube)
-        </button>
+        </Button>
       )}
 
       <div className="mt-4 text-xs text-gray-500">

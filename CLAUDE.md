@@ -5,6 +5,7 @@
 BatchVideo is a browser-based batch video processing application that allows users to apply LUTs, compress, and process multiple videos entirely client-side using FFmpeg.wasm. No server uploads required - all processing happens in the browser.
 
 **Key Characteristics:**
+
 - Client-side video processing (privacy-focused)
 - React 19 + TypeScript + Vite
 - Tailwind CSS for styling
@@ -88,12 +89,14 @@ The entire application state lives in `useVideoStore.ts`:
 ### FFmpeg.wasm Configuration
 
 **Critical Headers Required:**
+
 - `Cross-Origin-Opener-Policy: same-origin`
 - `Cross-Origin-Embedder-Policy: require-corp`
 
 These are set in `vite.config.ts` for development and must be configured in deployment (GitHub Pages).
 
 **Loading Strategy:**
+
 - FFmpeg instance is created lazily (only when needed)
 - Uses core-mt (multi-threaded) for better performance
 - Loaded from unpkg CDN
@@ -101,9 +104,11 @@ These are set in `vite.config.ts` for development and must be configured in depl
 ### File Type Support
 
 **Accepted Video Formats:**
+
 - MP4, MOV, MTS, M4V, AVI, MKV
 
 **LUT Format:**
+
 - Only .cube format supported
 
 ### Performance Considerations
@@ -150,6 +155,7 @@ These are set in `vite.config.ts` for development and must be configured in depl
 ### TypeScript Types
 
 All types defined in `src/types/index.ts`:
+
 - `VideoFile`: Core file metadata and status
 - `CompressionSettings`: Encoding parameters
 - `VideoStatus`: 'pending' | 'processing' | 'completed' | 'error'
@@ -210,6 +216,7 @@ npm run format # Prettier formatting
 ## Future Enhancement Opportunities
 
 See `development-plan.md` for detailed roadmap:
+
 - LUT preview feature
 - Before/after comparison
 - Frame extraction and preview
@@ -227,6 +234,7 @@ See `development-plan.md` for detailed roadmap:
 ## Testing Considerations
 
 Currently no test suite. When adding tests:
+
 - Mock FFmpeg.wasm (too heavy for unit tests)
 - Test state management logic separately
 - Use React Testing Library for components

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { X, CheckCircle, AlertCircle, Loader, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 import { formatFileSize, generateThumbnail } from '../utils/ffmpeg';
 import type { VideoFile } from '../types';
@@ -13,7 +14,7 @@ const FileItem = ({ file }: FileItemProps) => {
 
   useEffect(() => {
     if (!file.thumbnail && file.file) {
-      generateThumbnail(file.file).then(thumb => {
+      generateThumbnail(file.file).then((thumb) => {
         if (thumb) {
           updateFileThumbnail(file.id, thumb);
         }
@@ -24,11 +25,11 @@ const FileItem = ({ file }: FileItemProps) => {
   const getStatusIcon = () => {
     switch (file.status) {
       case 'completed':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'error':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
       case 'processing':
-        return <Loader className="w-5 h-5 text-blue-500 animate-spin" />;
+        return <Loader className="h-5 w-5 animate-spin text-blue-500" />;
       default:
         return null;
     }
@@ -44,46 +45,35 @@ const FileItem = ({ file }: FileItemProps) => {
   };
 
   return (
-    <div className="card flex items-center gap-4 hover:border-gray-600 transition-colors">
+    <div className="card flex items-center gap-4 transition-colors hover:border-gray-600 dark:hover:border-gray-500">
       {/* Thumbnail */}
-      <div className="w-24 h-16 bg-gray-900 rounded-lg overflow-hidden flex-shrink-0">
+      <div className="h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-900">
         {file.thumbnail ? (
-          <img
-            src={file.thumbnail}
-            alt={file.name}
-            className="w-full h-full object-cover"
-          />
+          <img src={file.thumbnail} alt={file.name} className="h-full w-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Loader className="w-6 h-6 text-gray-600 animate-spin" />
+          <div className="flex h-full w-full items-center justify-center">
+            <Loader className="h-6 w-6 animate-spin text-gray-600" />
           </div>
         )}
       </div>
 
       {/* File info */}
-      <div className="flex-1 min-w-0">
-        <p className="text-white font-medium truncate">{file.name}</p>
-        <p className="text-sm text-gray-400">{formatFileSize(file.size)}</p>
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-medium text-gray-900 dark:text-white">{file.name}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{formatFileSize(file.size)}</p>
 
         {/* Progress bar */}
         {file.status === 'processing' && (
-          <div className="mt-2 bg-gray-900 rounded-full h-2 overflow-hidden">
-            <div
-              className="bg-blue-500 h-full transition-all duration-300"
-              style={{ width: `${file.progress}%` }}
-            />
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-900">
+            <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${file.progress}%` }} />
           </div>
         )}
 
         {/* Error message */}
-        {file.status === 'error' && file.error && (
-          <p className="text-sm text-red-400 mt-1">{file.error}</p>
-        )}
+        {file.status === 'error' && file.error && <p className="mt-1 text-sm text-red-400">{file.error}</p>}
 
         {/* Progress percentage */}
-        {file.status === 'processing' && (
-          <p className="text-xs text-gray-400 mt-1">{file.progress}%</p>
-        )}
+        {file.status === 'processing' && <p className="mt-1 text-xs text-gray-400">{file.progress}%</p>}
       </div>
 
       {/* Status and actions */}
@@ -91,23 +81,15 @@ const FileItem = ({ file }: FileItemProps) => {
         {getStatusIcon()}
 
         {file.status === 'completed' && file.outputUrl && (
-          <button
-            onClick={handleDownload}
-            className="btn btn-secondary p-2"
-            title="Download processed video"
-          >
-            <Download className="w-4 h-4" />
-          </button>
+          <Button onClick={handleDownload} variant="secondary" size="icon" title="Download processed video">
+            <Download className="h-4 w-4" />
+          </Button>
         )}
 
         {!isProcessing && file.status !== 'processing' && (
-          <button
-            onClick={() => removeFile(file.id)}
-            className="btn btn-danger p-2"
-            title="Remove file"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <Button onClick={() => removeFile(file.id)} variant="destructive" size="icon" title="Remove file">
+            <X className="h-4 w-4" />
+          </Button>
         )}
       </div>
     </div>
@@ -123,9 +105,7 @@ const FileList = () => {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-white mb-4">
-        Files ({files.length})
-      </h3>
+      <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Files ({files.length})</h3>
       {files.map((file) => (
         <FileItem key={file.id} file={file} />
       ))}

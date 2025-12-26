@@ -23,7 +23,7 @@ const ProgressTracker = () => {
       <div className="mb-6">
         <div className="mb-2 h-3 overflow-hidden rounded-full bg-gray-900">
           <div
-            className="h-full bg-linear-to-r from-blue-500 to-purple-500 transition-all duration-300"
+            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
             style={{ width: `${overallProgress}%` }}
           />
         </div>

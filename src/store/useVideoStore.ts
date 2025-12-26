@@ -23,23 +23,28 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
   ffmpegLoaded: false,
 
   // Actions
-  addFiles: (newFiles: File[]) => set((state) => ({
-    files: [...state.files, ...newFiles.map((file, index) => ({
-      id: `${Date.now()}-${index}`,
-      file,
-      name: file.name,
-      size: file.size,
-      thumbnail: null,
-      status: 'pending' as FileStatus,
-      progress: 0,
-      outputUrl: null,
-      error: null,
-    }))]
-  })),
+  addFiles: (newFiles: File[]) =>
+    set((state) => ({
+      files: [
+        ...state.files,
+        ...newFiles.map((file, index) => ({
+          id: `${Date.now()}-${index}`,
+          file,
+          name: file.name,
+          size: file.size,
+          thumbnail: null,
+          status: 'pending' as FileStatus,
+          progress: 0,
+          outputUrl: null,
+          error: null,
+        })),
+      ],
+    })),
 
-  removeFile: (id: string) => set((state) => ({
-    files: state.files.filter(f => f.id !== id)
-  })),
+  removeFile: (id: string) =>
+    set((state) => ({
+      files: state.files.filter((f) => f.id !== id),
+    })),
 
   clearFiles: () => set({ files: [] }),
 
@@ -53,35 +58,30 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
 
   setResolution: (resolution: Resolution) => set({ resolution }),
 
-  updateFileStatus: (id: string, status: FileStatus) => set((state) => ({
-    files: state.files.map(f =>
-      f.id === id ? { ...f, status } : f
-    )
-  })),
+  updateFileStatus: (id: string, status: FileStatus) =>
+    set((state) => ({
+      files: state.files.map((f) => (f.id === id ? { ...f, status } : f)),
+    })),
 
-  updateFileProgress: (id: string, progress: number) => set((state) => ({
-    files: state.files.map(f =>
-      f.id === id ? { ...f, progress } : f
-    )
-  })),
+  updateFileProgress: (id: string, progress: number) =>
+    set((state) => ({
+      files: state.files.map((f) => (f.id === id ? { ...f, progress } : f)),
+    })),
 
-  updateFileOutput: (id: string, outputUrl: string) => set((state) => ({
-    files: state.files.map(f =>
-      f.id === id ? { ...f, outputUrl, status: 'completed' as FileStatus } : f
-    )
-  })),
+  updateFileOutput: (id: string, outputUrl: string) =>
+    set((state) => ({
+      files: state.files.map((f) => (f.id === id ? { ...f, outputUrl, status: 'completed' as FileStatus } : f)),
+    })),
 
-  updateFileError: (id: string, error: string) => set((state) => ({
-    files: state.files.map(f =>
-      f.id === id ? { ...f, error, status: 'error' as FileStatus } : f
-    )
-  })),
+  updateFileError: (id: string, error: string) =>
+    set((state) => ({
+      files: state.files.map((f) => (f.id === id ? { ...f, error, status: 'error' as FileStatus } : f)),
+    })),
 
-  updateFileThumbnail: (id: string, thumbnail: string) => set((state) => ({
-    files: state.files.map(f =>
-      f.id === id ? { ...f, thumbnail } : f
-    )
-  })),
+  updateFileThumbnail: (id: string, thumbnail: string) =>
+    set((state) => ({
+      files: state.files.map((f) => (f.id === id ? { ...f, thumbnail } : f)),
+    })),
 
   setProcessing: (isProcessing: boolean) => set({ isProcessing }),
 
@@ -102,12 +102,12 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
     const state = get();
     return {
       total: state.files.length,
-      completed: state.files.filter(f => f.status === 'completed').length,
-      processing: state.files.filter(f => f.status === 'processing').length,
-      pending: state.files.filter(f => f.status === 'pending').length,
-      error: state.files.filter(f => f.status === 'error').length,
+      completed: state.files.filter((f) => f.status === 'completed').length,
+      processing: state.files.filter((f) => f.status === 'processing').length,
+      pending: state.files.filter((f) => f.status === 'pending').length,
+      error: state.files.filter((f) => f.status === 'error').length,
     };
-  }
+  },
 }));
 
 export default useVideoStore;

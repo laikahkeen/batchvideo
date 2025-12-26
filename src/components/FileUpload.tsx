@@ -6,52 +6,49 @@ import useVideoStore from '../store/useVideoStore';
 const FileUpload = () => {
   const { addFiles, isProcessing } = useVideoStore();
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      addFiles(acceptedFiles);
-    }
-  }, [addFiles]);
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (acceptedFiles.length > 0) {
+        addFiles(acceptedFiles);
+      }
+    },
+    [addFiles]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'video/*': ['.mp4', '.mov', '.mts', '.m4v', '.avi', '.mkv']
+      'video/*': ['.mp4', '.mov', '.mts', '.m4v', '.avi', '.mkv'],
     },
     multiple: true,
-    disabled: isProcessing
+    disabled: isProcessing,
   });
 
   return (
     <div
       {...getRootProps()}
-      className={`
-        border-2 border-dashed rounded-xl p-12 text-center cursor-pointer
-        transition-all duration-200
-        ${isDragActive
+      className={`cursor-pointer rounded-xl border-2 border-dashed p-12 text-center transition-all duration-200 ${
+        isDragActive
           ? 'border-blue-500 bg-blue-500/10'
-          : 'border-gray-700 hover:border-gray-600 bg-gray-800/50'
-        }
-        ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
-      `}
+          : 'border-gray-300 bg-gray-50/50 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-800/50 dark:hover:border-gray-600'
+      } ${isProcessing ? 'cursor-not-allowed opacity-50' : ''} `}
     >
       <input {...getInputProps()} />
 
       <div className="flex flex-col items-center gap-4">
         {isDragActive ? (
           <>
-            <Upload className="w-16 h-16 text-blue-500" />
-            <p className="text-xl text-blue-500 font-medium">Drop your videos here...</p>
+            <Upload className="h-16 w-16 text-blue-500" />
+            <p className="text-xl font-medium text-blue-500">Drop your videos here...</p>
           </>
         ) : (
           <>
-            <Video className="w-16 h-16 text-gray-400" />
+            <Video className="h-16 w-16 text-gray-400 dark:text-gray-500" />
             <div>
-              <p className="text-xl text-gray-200 font-medium mb-2">
+              <p className="mb-2 text-xl font-medium text-gray-700 dark:text-gray-200">
                 Drop video files here or click to browse
               </p>
-              <p className="text-sm text-gray-400">
-                Supports MP4, MOV, MTS, M4V, AVI, MKV
-              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Supports MP4, MOV, MTS, M4V, AVI, MKV</p>
             </div>
           </>
         )}
