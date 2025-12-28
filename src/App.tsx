@@ -44,7 +44,7 @@ function App() {
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-6 py-8">
         {/* Info Section */}
-        <div className="mb-8 rounded-xl border border-blue-200/50 bg-gradient-to-r from-blue-50 to-purple-50 p-6 dark:border-blue-800/30 dark:from-blue-900/20 dark:to-purple-900/20">
+        <div className="mb-8 rounded-xl border border-blue-200/50 bg-linear-to-r from-blue-50 to-purple-50 p-6 dark:border-blue-800/30 dark:from-blue-900/20 dark:to-purple-900/20">
           <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">How it works</h3>
           <div className="grid gap-4 text-sm text-gray-700 md:grid-cols-3 dark:text-gray-300">
             <div>
@@ -82,16 +82,12 @@ function App() {
           <FileUpload />
         </div>
 
-        {/* Progress Tracker */}
-        <div className="mb-8">
-          <ProgressTracker />
-        </div>
-
         {/* Two Column Layout */}
         <div className="mb-8 grid gap-6 lg:grid-cols-3">
           {/* Left Column - File List */}
-          <div className="lg:col-span-2">
+          <div className="space-y-6 lg:col-span-2">
             <FileList />
+            <ProgressTracker />
           </div>
 
           {/* Right Column - Settings */}

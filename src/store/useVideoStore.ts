@@ -16,6 +16,7 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
 
   // Processing state
   isProcessing: false,
+  isCancelled: false,
   currentFileIndex: -1,
   processingProgress: {},
 
@@ -85,6 +86,8 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
 
   setProcessing: (isProcessing: boolean) => set({ isProcessing }),
 
+  setCancelled: (isCancelled: boolean) => set({ isCancelled }),
+
   setCurrentFileIndex: (index: number) => set({ currentFileIndex: index }),
 
   setFFmpegLoaded: (loaded: boolean) => set({ ffmpegLoaded: loaded }),
@@ -93,8 +96,17 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
   getOverallProgress: () => {
     const state = get();
     if (state.files.length === 0) return 0;
-    const totalProgress = state.files.reduce((acc, file) => acc + file.progress, 0);
-    return Math.round(totalProgress / state.files.length);
+
+    // Calculate progress based on file status and individual progress
+    const totalProgress = state.files.reduce((acc, file) => {
+      if (file.status === 'completed') return acc + 100;
+      if (file.status === 'processing') return acc + Math.min(Math.max(file.progress || 0, 0), 100);
+      return acc; // pending or error = 0
+    }, 0);
+
+    const result = Math.round(totalProgress / state.files.length);
+    // Ensure result is a valid number between 0 and 100
+    return isNaN(result) || !isFinite(result) ? 0 : Math.min(Math.max(result, 0), 100);
   },
 
   // Get processing stats

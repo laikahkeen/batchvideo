@@ -1,4 +1,4 @@
-import { Play, Download, Trash2 } from 'lucide-react';
+import { Play, Download, Trash2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 import { processVideo, loadFFmpeg } from '../utils/ffmpeg';
@@ -11,6 +11,7 @@ const ProcessButton = () => {
     compressionQuality,
     codec,
     setProcessing,
+    setCancelled,
     updateFileStatus,
     updateFileProgress,
     updateFileOutput,
@@ -29,6 +30,7 @@ const ProcessButton = () => {
     if (files.length === 0) return;
 
     setProcessing(true);
+    setCancelled(false);
 
     try {
       // Load FFmpeg if not already loaded
@@ -39,6 +41,15 @@ const ProcessButton = () => {
 
       // Process each file sequentially
       for (const file of files) {
+        // Check if cancelled
+        if (useVideoStore.getState().isCancelled) {
+          // Mark remaining pending files as error
+          if (file.status === 'pending') {
+            updateFileError(file.id, 'Cancelled by user');
+          }
+          continue;
+        }
+
         if (file.status === 'completed') continue;
 
         updateFileStatus(file.id, 'processing');
@@ -57,6 +68,12 @@ const ProcessButton = () => {
             }
           );
 
+          // Check if cancelled after processing
+          if (useVideoStore.getState().isCancelled) {
+            updateFileError(file.id, 'Cancelled by user');
+            continue;
+          }
+
           updateFileOutput(file.id, result.url);
         } catch (error) {
           console.error(`Error processing ${file.name}:`, error);
@@ -68,6 +85,17 @@ const ProcessButton = () => {
       alert('An error occurred during processing. Please try again.');
     } finally {
       setProcessing(false);
+      setCancelled(false);
+    }
+  };
+
+  const handleCancel = () => {
+    if (
+      confirm(
+        'Are you sure you want to cancel the processing? Files currently being processed will be marked as failed.'
+      )
+    ) {
+      setCancelled(true);
     }
   };
 
@@ -121,10 +149,17 @@ const ProcessButton = () => {
             </>
           )}
 
-          {!allCompleted && (
-            <Button onClick={handleProcess} disabled={isProcessing} size="lg" className="px-8">
+          {!allCompleted && !isProcessing && (
+            <Button onClick={handleProcess} size="lg" className="px-8">
               <Play className="h-5 w-5" />
-              {isProcessing ? 'Processing...' : 'Process Batch'}
+              Process Batch
+            </Button>
+          )}
+
+          {!allCompleted && isProcessing && (
+            <Button onClick={handleCancel} variant="destructive" size="lg" className="px-8">
+              <XCircle className="h-5 w-5" />
+              Cancel Processing
             </Button>
           )}
         </div>

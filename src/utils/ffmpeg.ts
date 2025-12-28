@@ -5,22 +5,26 @@ import type { ProcessingOptions } from '../types';
 let ffmpegInstance: FFmpeg | null = null;
 
 export const loadFFmpeg = async (onProgress?: (progress: number) => void): Promise<FFmpeg> => {
-  if (ffmpegInstance) return ffmpegInstance;
+  if (ffmpegInstance) {
+    // If already loaded, update the progress callback if provided
+    if (onProgress) {
+      ffmpegInstance.on('progress', ({ progress }) => {
+        onProgress(Math.round(progress * 100));
+      });
+    }
+    return ffmpegInstance;
+  }
 
   const ffmpeg = new FFmpeg();
 
-  ffmpeg.on('log', ({ message }) => {
-    console.log('FFmpeg:', message);
-  });
-
-  ffmpeg.on('progress', ({ progress }) => {
-    if (onProgress) {
+  if (onProgress) {
+    ffmpeg.on('progress', ({ progress }) => {
       onProgress(Math.round(progress * 100));
-    }
-  });
+    });
+  }
 
-  // Load from local node_modules
-  const baseURL = '/node_modules/@ffmpeg/core/dist/esm';
+  // Load from CDN (unpkg) - works in both dev and production
+  const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
 
   await ffmpeg.load({
     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
@@ -34,16 +38,25 @@ export const loadFFmpeg = async (onProgress?: (progress: number) => void): Promi
 export const getFFmpeg = (): FFmpeg | null => ffmpegInstance;
 
 export const generateThumbnail = async (file: File): Promise<string | null> => {
+  let inputName = '';
+  let outputName = '';
+
   try {
+    // Ensure FFmpeg is loaded
     const ffmpeg = await loadFFmpeg();
-    const inputName = 'input.mp4';
-    const outputName = 'thumbnail.jpg';
+
+    // Use unique filenames to avoid conflicts when multiple thumbnails are generated concurrently
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    inputName = `input-${uniqueId}.mp4`;
+    outputName = `thumbnail-${uniqueId}.jpg`;
 
     // Write input file
     await ffmpeg.writeFile(inputName, await fetchFile(file));
 
-    // Extract frame at 1 second
-    await ffmpeg.exec(['-i', inputName, '-ss', '00:00:01', '-vframes', '1', '-vf', 'scale=320:-1', outputName]);
+    // Extract first frame (much faster than seeking to 1 second)
+    // -vframes 1: Extract only 1 frame
+    // -vf scale=320:-1: Scale to 320px width, maintain aspect ratio
+    await ffmpeg.exec(['-i', inputName, '-vframes', '1', '-vf', 'scale=320:-1', outputName]);
 
     // Read output file
     const data = await ffmpeg.readFile(outputName);
@@ -54,12 +67,29 @@ export const generateThumbnail = async (file: File): Promise<string | null> => {
     const url = URL.createObjectURL(blob);
 
     // Cleanup
-    await ffmpeg.deleteFile(inputName);
-    await ffmpeg.deleteFile(outputName);
+    await ffmpeg.deleteFile(inputName).catch(() => {});
+    await ffmpeg.deleteFile(outputName).catch(() => {});
 
     return url;
   } catch (error) {
     console.error('Error generating thumbnail:', error);
+
+    // Ensure cleanup even on error
+    if (ffmpegInstance && inputName) {
+      try {
+        await ffmpegInstance.deleteFile(inputName).catch(() => {});
+      } catch (e) {
+        // Ignore cleanup errors
+      }
+    }
+    if (ffmpegInstance && outputName) {
+      try {
+        await ffmpegInstance.deleteFile(outputName).catch(() => {});
+      } catch (e) {
+        // Ignore cleanup errors
+      }
+    }
+
     return null;
   }
 };

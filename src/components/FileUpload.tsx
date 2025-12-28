@@ -1,10 +1,32 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Video } from 'lucide-react';
+import { Upload, Video, Loader } from 'lucide-react';
 import useVideoStore from '../store/useVideoStore';
+import { loadFFmpeg } from '../utils/ffmpeg';
 
 const FileUpload = () => {
-  const { addFiles, isProcessing } = useVideoStore();
+  const { addFiles, isProcessing, ffmpegLoaded, setFFmpegLoaded } = useVideoStore();
+  const [isInitializing, setIsInitializing] = useState(!ffmpegLoaded);
+
+  useEffect(() => {
+    const initFFmpeg = async () => {
+      if (!ffmpegLoaded) {
+        try {
+          setIsInitializing(true);
+          await loadFFmpeg();
+          setFFmpegLoaded(true);
+        } catch (error) {
+          console.error('Failed to initialize FFmpeg:', error);
+        } finally {
+          setIsInitializing(false);
+        }
+      } else {
+        setIsInitializing(false);
+      }
+    };
+
+    initFFmpeg();
+  }, [ffmpegLoaded, setFFmpegLoaded]);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -21,7 +43,7 @@ const FileUpload = () => {
       'video/*': ['.mp4', '.mov', '.mts', '.m4v', '.avi', '.mkv'],
     },
     multiple: true,
-    disabled: isProcessing,
+    disabled: isProcessing || isInitializing,
   });
 
   return (
@@ -31,12 +53,18 @@ const FileUpload = () => {
         isDragActive
           ? 'border-blue-500 bg-blue-500/10'
           : 'border-gray-300 bg-gray-50/50 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-800/50 dark:hover:border-gray-600'
-      } ${isProcessing ? 'cursor-not-allowed opacity-50' : ''} `}
+      } ${isProcessing || isInitializing ? 'cursor-not-allowed opacity-50' : ''} `}
     >
       <input {...getInputProps()} />
 
       <div className="flex flex-col items-center gap-4">
-        {isDragActive ? (
+        {isInitializing ? (
+          <>
+            <Loader className="h-16 w-16 animate-spin text-blue-500" />
+            <p className="text-xl font-medium text-blue-500">Initializing FFmpeg...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Please wait a moment</p>
+          </>
+        ) : isDragActive ? (
           <>
             <Upload className="h-16 w-16 text-blue-500" />
             <p className="text-xl font-medium text-blue-500">Drop your videos here...</p>
@@ -54,7 +82,7 @@ const FileUpload = () => {
         )}
       </div>
 
-      {!isProcessing && (
+      {!isProcessing && !isInitializing && (
         <div className="mt-6 text-xs text-gray-500">
           <p>Recommended: 1-5 files, under 5 minutes each, 1080p or lower</p>
           <p className="mt-1">Processing happens in your browser - keep this tab open</p>

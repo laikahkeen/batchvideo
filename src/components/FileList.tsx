@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { X, CheckCircle, AlertCircle, Loader, Download } from 'lucide-react';
+import { X, CheckCircle, AlertCircle, Loader, Download, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 import { formatFileSize, generateThumbnail } from '../utils/ffmpeg';
@@ -13,14 +13,37 @@ const FileItem = ({ file }: FileItemProps) => {
   const { removeFile, isProcessing, updateFileThumbnail } = useVideoStore();
 
   useEffect(() => {
+    let cancelled = false;
+
     if (!file.thumbnail && file.file) {
-      generateThumbnail(file.file).then((thumb) => {
-        if (thumb) {
-          updateFileThumbnail(file.id, thumb);
+      // Generate thumbnail with retry logic
+      const attemptGeneration = async (retries = 2) => {
+        for (let i = 0; i <= retries; i++) {
+          if (cancelled) return;
+
+          try {
+            const thumb = await generateThumbnail(file.file);
+            if (thumb && !cancelled) {
+              updateFileThumbnail(file.id, thumb);
+              return;
+            }
+          } catch (error) {
+            console.error(`Thumbnail generation attempt ${i + 1} failed:`, error);
+            if (i < retries) {
+              // Wait a bit before retrying (exponential backoff)
+              await new Promise((resolve) => setTimeout(resolve, 500 * (i + 1)));
+            }
+          }
         }
-      });
+      };
+
+      attemptGeneration();
     }
-  }, [file.id, file.file, file.thumbnail, updateFileThumbnail]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [file.id, file.file, file.thumbnail]);
 
   const getStatusIcon = () => {
     switch (file.status) {
@@ -47,7 +70,7 @@ const FileItem = ({ file }: FileItemProps) => {
   return (
     <div className="card flex items-center gap-4 transition-colors hover:border-gray-600 dark:hover:border-gray-500">
       {/* Thumbnail */}
-      <div className="h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-900">
+      <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-900">
         {file.thumbnail ? (
           <img src={file.thumbnail} alt={file.name} className="h-full w-full object-cover" />
         ) : (
@@ -97,15 +120,34 @@ const FileItem = ({ file }: FileItemProps) => {
 };
 
 const FileList = () => {
-  const { files } = useVideoStore();
+  const { files, clearFiles, isProcessing } = useVideoStore();
 
   if (files.length === 0) {
-    return null;
+    return (
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No files uploaded</h3>
+      </div>
+    );
   }
+
+  const handleRemoveAll = () => {
+    if (confirm(`Are you sure you want to remove all ${files.length} files?`)) {
+      clearFiles();
+    }
+  };
 
   return (
     <div className="space-y-3">
-      <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Files ({files.length})</h3>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Files ({files.length})</h3>
+        {!isProcessing && (
+          <Button onClick={handleRemoveAll} variant="destructive" size="sm">
+            <Trash2 className="mr-2 h-4 w-4" />
+            Remove All
+          </Button>
+        )}
+      </div>
+
       {files.map((file) => (
         <FileItem key={file.id} file={file} />
       ))}

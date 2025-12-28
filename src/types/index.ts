@@ -46,6 +46,7 @@ export interface VideoStoreState {
 
   // Processing state
   isProcessing: boolean;
+  isCancelled: boolean;
   currentFileIndex: number;
   processingProgress: Record<string, number>;
 
@@ -67,6 +68,7 @@ export interface VideoStoreState {
   updateFileError: (id: string, error: string) => void;
   updateFileThumbnail: (id: string, thumbnail: string) => void;
   setProcessing: (isProcessing: boolean) => void;
+  setCancelled: (isCancelled: boolean) => void;
   setCurrentFileIndex: (index: number) => void;
   setFFmpegLoaded: (loaded: boolean) => void;
   getOverallProgress: () => number;
