@@ -1,10 +1,13 @@
 import { useRef } from 'react';
 import { Upload, X, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import useVideoStore from '../store/useVideoStore';
 
 const LUTUpload = () => {
-  const { lutFile, setLUT, removeLUT, isProcessing } = useVideoStore();
+  const { lutFile, setLUT, removeLUT, isProcessing, isLutOnlyMode, setLutOnlyMode } = useVideoStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,6 +76,37 @@ const LUTUpload = () => {
           Upload LUT File (.cube)
         </Button>
       )}
+
+      <div className="mt-4 rounded-lg border border-gray-300 p-4 dark:border-gray-700">
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label
+              htmlFor="lut-only-mode"
+              className={cn(
+                "text-sm font-medium",
+                !lutFile && "text-gray-500 dark:text-gray-500"
+              )}
+            >
+              LUT Only Mode
+            </Label>
+            <p className={cn(
+              "text-xs",
+              lutFile ? "text-gray-600 dark:text-gray-400" : "text-gray-500 dark:text-gray-600"
+            )}>
+              {lutFile
+                ? "Apply LUT without compression (keeps original quality)"
+                : "Upload a LUT file to enable this mode"
+              }
+            </p>
+          </div>
+          <Switch
+            id="lut-only-mode"
+            checked={isLutOnlyMode}
+            onCheckedChange={setLutOnlyMode}
+            disabled={isProcessing || !lutFile}
+          />
+        </div>
+      </div>
 
       <div className="mt-4 text-xs text-gray-500">
         <p>LUT will be applied to all videos during processing</p>

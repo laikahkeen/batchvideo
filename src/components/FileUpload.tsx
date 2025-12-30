@@ -2,10 +2,23 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, Video, Loader } from 'lucide-react';
 import useVideoStore from '../store/useVideoStore';
-import { loadFFmpeg } from '../utils/ffmpeg';
+import { loadFFmpeg, getVideoDuration, calculatePredictedSize, formatFileSize, checkFileSizeLimit } from '../utils/ffmpeg';
 
 const FileUpload = () => {
-  const { addFiles, isProcessing, ffmpegLoaded, setFFmpegLoaded } = useVideoStore();
+  const {
+    files,
+    addFiles,
+    isProcessing,
+    ffmpegLoaded,
+    setFFmpegLoaded,
+    updateFilePredictedSize,
+    updateFileDuration,
+    compressionMethod,
+    targetPercentage,
+    targetSizePerMinute,
+    qualityCrf,
+    isLutOnlyMode
+  } = useVideoStore();
   const [isInitializing, setIsInitializing] = useState(!ffmpegLoaded);
 
   useEffect(() => {
@@ -29,12 +42,55 @@ const FileUpload = () => {
   }, [ffmpegLoaded, setFFmpegLoaded]);
 
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      if (acceptedFiles.length > 0) {
-        addFiles(acceptedFiles);
+    async (acceptedFiles: File[]) => {
+      if (acceptedFiles.length === 0) return;
+
+      // Check if total size exceeds 2GB limit
+      const sizeCheck = checkFileSizeLimit(files, acceptedFiles);
+      if (!sizeCheck.withinLimit) {
+        alert(
+          `Total file size exceeds 2GB limit.\n\n` +
+          `Current files: ${formatFileSize(sizeCheck.currentSize)}\n` +
+          `New files: ${formatFileSize(sizeCheck.newSize)}\n` +
+          `Total: ${formatFileSize(sizeCheck.totalSize)}\n\n` +
+          `Please remove some files or upload smaller files.`
+        );
+        return;
+      }
+
+      // Add files with a shared timestamp for ID generation
+      const timestamp = Date.now();
+      addFiles(acceptedFiles, timestamp);
+
+      // Calculate predicted sizes and cache duration for new files (in background)
+      if (!isLutOnlyMode) {
+        acceptedFiles.forEach(async (file, index) => {
+          try {
+            const duration = await getVideoDuration(file);
+            const fileId = `${timestamp}-${index}`;
+
+            if (duration > 0) {
+              // Cache the duration
+              updateFileDuration(fileId, duration);
+
+              // Calculate predicted size
+              const predicted = calculatePredictedSize(file, duration, {
+                compressionMethod,
+                targetPercentage,
+                targetSizePerMinute,
+                qualityCrf,
+              });
+              if (predicted !== null) {
+                updateFilePredictedSize(fileId, predicted);
+              }
+            }
+          } catch (error) {
+            console.error('Error calculating predicted size:', error);
+          }
+        });
       }
     },
-    [addFiles]
+    [addFiles, files, compressionMethod, targetPercentage, targetSizePerMinute, qualityCrf, isLutOnlyMode, updateFilePredictedSize, updateFileDuration]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -86,6 +142,9 @@ const FileUpload = () => {
         <div className="mt-6 text-xs text-gray-500">
           <p>Recommended: 1-5 files, under 5 minutes each, 1080p or lower</p>
           <p className="mt-1">Processing happens in your browser - keep this tab open</p>
+          <p className="mt-1 font-medium">
+            Max total size: 2GB {files.length > 0 && `(Current: ${formatFileSize(files.reduce((sum, f) => sum + f.size, 0))})`}
+          </p>
         </div>
       )}
     </div>

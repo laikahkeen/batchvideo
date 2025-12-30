@@ -8,8 +8,16 @@ const ProcessButton = () => {
     files,
     isProcessing,
     lutFile,
-    compressionQuality,
+    compressionMethod,
+    targetPercentage,
+    targetSizePerMinute,
+    qualityCrf,
+    maxBitrate,
+    bufferSize,
     codec,
+    resolution,
+    preset,
+    isLutOnlyMode,
     setProcessing,
     setCancelled,
     updateFileStatus,
@@ -59,9 +67,16 @@ const ProcessButton = () => {
             file.file,
             {
               lutFile,
-              compressionQuality,
               codec,
-              resolution: 'original',
+              resolution,
+              preset,
+              isLutOnlyMode,
+              compressionMethod,
+              targetPercentage,
+              targetSizePerMinute,
+              qualityCrf,
+              maxBitrate,
+              bufferSize,
             },
             (progress: number) => {
               updateFileProgress(file.id, progress);
@@ -74,7 +89,7 @@ const ProcessButton = () => {
             continue;
           }
 
-          updateFileOutput(file.id, result.url);
+          updateFileOutput(file.id, result.url, result.size);
         } catch (error) {
           console.error(`Error processing ${file.name}:`, error);
           updateFileError(file.id, (error as Error).message || 'Processing failed');

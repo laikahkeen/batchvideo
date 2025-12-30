@@ -10,7 +10,8 @@ import GitHubLink from './components/GitHubLink';
 import useVideoStore from './store/useVideoStore';
 
 function App() {
-  const { isProcessing } = useVideoStore();
+  const { isProcessing, files } = useVideoStore();
+  const hasFiles = files.length > 0;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-100 via-gray-50 to-gray-100 transition-colors dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -42,7 +43,7 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-6 py-8">
+      <main className="mx-auto max-w-3xl px-6 py-8">
         {/* Info Section */}
         <div className="mb-8 rounded-xl border border-blue-200/50 bg-linear-to-r from-blue-50 to-purple-50 p-6 dark:border-blue-800/30 dark:from-blue-900/20 dark:to-purple-900/20">
           <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">How it works</h3>
@@ -77,24 +78,21 @@ function App() {
           </div>
         </div>
 
-        {/* Upload Section */}
-        <div className="mb-8">
-          <FileUpload />
-        </div>
-
-        {/* Two Column Layout */}
-        <div className="mb-8 grid gap-6 lg:grid-cols-3">
-          {/* Left Column - File List */}
-          <div className="space-y-6 lg:col-span-2">
+        {/* Upload Section or File List */}
+        {!hasFiles ? (
+          <div className="mb-8">
+            <FileUpload />
+          </div>
+        ) : (
+          <div className="mb-8 space-y-6">
             <FileList />
             <ProgressTracker />
           </div>
+        )}
 
-          {/* Right Column - Settings */}
-          <div className="space-y-6">
-            <LUTUpload />
-            <CompressionSettings />
-          </div>
+        <div className="mb-8 space-y-6">
+          <LUTUpload />
+          <CompressionSettings />
         </div>
 
         {/* Footer Info */}

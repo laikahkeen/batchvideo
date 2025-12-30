@@ -1,6 +1,6 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
-import type { ProcessingOptions } from '../types';
+import type { ProcessingOptions, CompressionMethod } from '../types';
 
 let ffmpegInstance: FFmpeg | null = null;
 
@@ -46,7 +46,7 @@ export const generateThumbnail = async (file: File): Promise<string | null> => {
     const ffmpeg = await loadFFmpeg();
 
     // Use unique filenames to avoid conflicts when multiple thumbnails are generated concurrently
-    const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
     inputName = `input-${uniqueId}.mp4`;
     outputName = `thumbnail-${uniqueId}.jpg`;
 
@@ -116,31 +116,103 @@ export const processVideo = async (
     // Build FFmpeg command
     const args: string[] = ['-i', inputName];
 
-    // Add LUT filter if present
-    if (options.lutFile) {
-      args.push('-vf', 'lut3d=lut.cube');
+    // LUT Only Mode: Apply LUT with minimal re-encoding
+    if (options.isLutOnlyMode) {
+      if (options.lutFile) {
+        // Apply LUT filter - must re-encode video
+        args.push('-vf', 'lut3d=lut.cube');
+        // Use very fast preset and high quality CRF to maintain quality
+        args.push('-c:v', 'libx264');
+        args.push('-preset', 'ultrafast');
+        args.push('-crf', '18'); // Very high quality
+      }
+      // Copy audio without re-encoding
+      args.push('-c:a', 'copy');
+    } else {
+      // Normal compression mode
+
+      // Build video filters (combine LUT + resolution to avoid overwriting -vf)
+      const videoFilters: string[] = [];
+
+      if (options.lutFile) {
+        videoFilters.push('lut3d=lut.cube');
+      }
+
+      if (options.resolution !== 'original') {
+        videoFilters.push(`scale=${options.resolution}:-1`);
+      }
+
+      if (videoFilters.length > 0) {
+        args.push('-vf', videoFilters.join(','));
+      }
+
+      // Add codec settings
+      if (options.codec === 'h264') {
+        args.push('-c:v', 'libx264');
+      } else if (options.codec === 'h265') {
+        args.push('-c:v', 'libx265');
+      }
+
+      // Determine encoding parameters based on compression method
+      let shouldUseBitrate = false;
+      let targetBitrate = 0;
+      let targetCRF = 23;
+
+      switch (options.compressionMethod) {
+        case 'percentage':
+        case 'size_per_minute': {
+          // Calculate target bitrate
+          const calculatedBitrate = await calculateTargetBitrate(file, options.compressionMethod, {
+            targetPercentage: options.targetPercentage,
+            targetSizePerMinute: options.targetSizePerMinute,
+          });
+
+          if (calculatedBitrate) {
+            shouldUseBitrate = true;
+            targetBitrate = calculatedBitrate;
+          } else {
+            // Fallback to CRF if calculation fails
+            console.warn('Failed to calculate bitrate, falling back to CRF 23');
+            targetCRF = 23;
+          }
+          break;
+        }
+
+        case 'quality': {
+          // Use CRF mode with quality value
+          targetCRF = options.qualityCrf || 23;
+          break;
+        }
+
+        default:
+          // Fallback to CRF 23
+          targetCRF = 23;
+      }
+
+      // Apply encoding mode
+      if (shouldUseBitrate) {
+        args.push('-b:v', `${targetBitrate}k`);
+      } else {
+        args.push('-crf', String(targetCRF));
+
+        // Add maxBitrate constraint if specified (for quality mode)
+        if (options.maxBitrate && options.maxBitrate > 0) {
+          args.push('-maxrate', `${options.maxBitrate}k`);
+
+          // Add buffer size (defaults to 2x maxBitrate if not specified or 0)
+          const bufSize = options.bufferSize && options.bufferSize > 0
+            ? options.bufferSize
+            : options.maxBitrate * 2;
+          args.push('-bufsize', `${bufSize}k`);
+        }
+      }
+
+      // Add preset for speed/quality balance
+      args.push('-preset', options.preset);
+
+      // Copy audio
+      args.push('-c:a', 'copy');
     }
-
-    // Add codec settings
-    if (options.codec === 'h264') {
-      args.push('-c:v', 'libx264');
-    } else if (options.codec === 'h265') {
-      args.push('-c:v', 'libx265');
-    }
-
-    // Add CRF (quality)
-    args.push('-crf', String(options.compressionQuality));
-
-    // Add preset for speed/quality balance
-    args.push('-preset', 'medium');
-
-    // Resolution scaling
-    if (options.resolution !== 'original') {
-      args.push('-vf', `scale=${options.resolution}:-1`);
-    }
-
-    // Copy audio
-    args.push('-c:a', 'copy');
 
     // Output file
     args.push(outputName);
@@ -208,15 +280,130 @@ export const getVideoDuration = (file: File): Promise<number> => {
     const video = document.createElement('video');
     video.preload = 'metadata';
 
+    const cleanup = () => {
+      if (video.src) {
+        window.URL.revokeObjectURL(video.src);
+      }
+    };
+
     video.onloadedmetadata = () => {
-      window.URL.revokeObjectURL(video.src);
+      cleanup();
       resolve(video.duration);
     };
 
     video.onerror = () => {
+      cleanup();
       resolve(0);
     };
 
     video.src = URL.createObjectURL(file);
   });
+};
+
+/**
+ * Calculate target bitrate based on compression method
+ * Returns bitrate in kbps
+ */
+export const calculateTargetBitrate = async (
+  file: File,
+  compressionMethod: CompressionMethod,
+  options: {
+    targetPercentage?: number;
+    targetSizePerMinute?: number;
+  }
+): Promise<number | null> => {
+  try {
+    const duration = await getVideoDuration(file);
+    if (!duration || duration <= 0) return null;
+
+    const originalSizeMB = file.size / (1024 * 1024);
+
+    switch (compressionMethod) {
+      case 'percentage': {
+        if (!options.targetPercentage) return null;
+        // Calculate target size in MB
+        const targetSizeMB = originalSizeMB * (options.targetPercentage / 100);
+        // Convert to bitrate (kbps)
+        // Formula: (size_MB * 8 * 1024) / duration_seconds
+        // Subtract audio bitrate (assume 128 kbps) to get video bitrate
+        const totalBitrate = (targetSizeMB * 8 * 1024) / duration;
+        const audioBitrate = 128; // kbps
+        const videoBitrate = Math.max(500, totalBitrate - audioBitrate); // Minimum 500 kbps
+        return Math.round(videoBitrate);
+      }
+
+      case 'size_per_minute': {
+        if (!options.targetSizePerMinute) return null;
+        // Calculate bitrate from MB/min
+        // Formula: (MB_per_min * 8 * 1024) / 60
+        const totalBitrate = (options.targetSizePerMinute * 8 * 1024) / 60;
+        const audioBitrate = 128; // kbps
+        const videoBitrate = Math.max(500, totalBitrate - audioBitrate);
+        return Math.round(videoBitrate);
+      }
+
+      default:
+        return null;
+    }
+  } catch (error) {
+    console.error('Error calculating target bitrate:', error);
+    return null;
+  }
+};
+
+export const calculatePredictedSize = (
+  file: File,
+  durationSeconds: number,
+  options: {
+    compressionMethod: CompressionMethod;
+    targetPercentage?: number;
+    targetSizePerMinute?: number;
+    qualityCrf?: number;
+  }
+): number | null => {
+  if (!durationSeconds || durationSeconds <= 0) return null;
+
+  const originalSizeBytes = file.size;
+  const durationMin = durationSeconds / 60;
+
+  switch (options.compressionMethod) {
+    case 'percentage': {
+      if (!options.targetPercentage) return null;
+      // Calculate based on percentage of original size
+      return Math.round(originalSizeBytes * (options.targetPercentage / 100));
+    }
+
+    case 'size_per_minute': {
+      if (!options.targetSizePerMinute) return null;
+      // Calculate based on MB per minute
+      const targetSizeMB = options.targetSizePerMinute * durationMin;
+      return Math.round(targetSizeMB * 1024 * 1024);
+    }
+
+    case 'quality': {
+      // CRF mode: file size is content-dependent and cannot be accurately predicted
+      return null;
+    }
+
+    default:
+      return null;
+  }
+};
+
+export const MAX_TOTAL_SIZE = 2 * 1024 * 1024 * 1024; // 2GB in bytes
+
+export const checkFileSizeLimit = (
+  currentFiles: { size: number }[],
+  newFiles: File[]
+): { withinLimit: boolean; currentSize: number; newSize: number; totalSize: number } => {
+  const currentSize = currentFiles.reduce((sum, f) => sum + f.size, 0);
+  const newSize = newFiles.reduce((sum, f) => sum + f.size, 0);
+  const totalSize = currentSize + newSize;
+
+  return {
+    withinLimit: totalSize <= MAX_TOTAL_SIZE,
+    currentSize,
+    newSize,
+    totalSize
+  };
 };

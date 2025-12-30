@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { VideoStoreState, FileStatus, Codec, Resolution } from '../types';
+import type { VideoStoreState, FileStatus, Codec, Resolution, FFmpegPreset, CompressionMethod } from '../types';
 
 const useVideoStore = create<VideoStoreState>((set, get) => ({
   // Video files
@@ -10,9 +10,20 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
   lutFile: null,
 
   // Compression settings
-  compressionQuality: 23, // CRF value (18-28)
+  compressionMethod: 'quality' as CompressionMethod, // Default to quality mode
+  targetPercentage: 60, // 60% of original size
+  targetSizePerMinute: 15, // 15 MB per minute
+
+  // Quality mode (CRF) settings
+  qualityCrf: 23, // Default to CRF 23 (good quality)
+  maxBitrate: 0, // 0 = no max bitrate constraint
+  bufferSize: 0, // 0 = auto (2x maxBitrate)
+  preset: 'medium' as FFmpegPreset, // Compression speed
+
+  // Global settings
   codec: 'h264' as Codec,
   resolution: 'original' as Resolution,
+  isLutOnlyMode: false,
 
   // Processing state
   isProcessing: false,
@@ -24,23 +35,28 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
   ffmpegLoaded: false,
 
   // Actions
-  addFiles: (newFiles: File[]) =>
+  addFiles: (newFiles: File[], timestamp?: number) => {
+    const ts = timestamp || Date.now();
     set((state) => ({
       files: [
         ...state.files,
         ...newFiles.map((file, index) => ({
-          id: `${Date.now()}-${index}`,
+          id: `${ts}-${index}`,
           file,
           name: file.name,
           size: file.size,
+          duration: null,
           thumbnail: null,
           status: 'pending' as FileStatus,
           progress: 0,
           outputUrl: null,
+          outputSize: null,
+          predictedSize: null,
           error: null,
         })),
       ],
-    })),
+    }));
+  },
 
   removeFile: (id: string) =>
     set((state) => ({
@@ -51,13 +67,30 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
 
   setLUT: (lutFile: File) => set({ lutFile, lut: lutFile }),
 
-  removeLUT: () => set({ lutFile: null, lut: null }),
+  removeLUT: () => set({ lutFile: null, lut: null, isLutOnlyMode: false }),
 
-  setCompressionQuality: (quality: number) => set({ compressionQuality: quality }),
+  // Compression method setters
+  setCompressionMethod: (method: CompressionMethod) => set({ compressionMethod: method }),
 
+  setTargetPercentage: (percentage: number) => set({ targetPercentage: percentage }),
+
+  setTargetSizePerMinute: (size: number) => set({ targetSizePerMinute: size }),
+
+  // Quality mode (CRF) setters
+  setQualityCrf: (crf: number) => set({ qualityCrf: crf }),
+
+  setMaxBitrate: (bitrate: number) => set({ maxBitrate: bitrate }),
+
+  setBufferSize: (size: number) => set({ bufferSize: size }),
+
+  setPreset: (preset: FFmpegPreset) => set({ preset }),
+
+  // Global setters
   setCodec: (codec: Codec) => set({ codec }),
 
   setResolution: (resolution: Resolution) => set({ resolution }),
+
+  setLutOnlyMode: (isLutOnly: boolean) => set({ isLutOnlyMode: isLutOnly }),
 
   updateFileStatus: (id: string, status: FileStatus) =>
     set((state) => ({
@@ -69,9 +102,21 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
       files: state.files.map((f) => (f.id === id ? { ...f, progress } : f)),
     })),
 
-  updateFileOutput: (id: string, outputUrl: string) =>
+  updateFileOutput: (id: string, outputUrl: string, outputSize?: number) =>
     set((state) => ({
-      files: state.files.map((f) => (f.id === id ? { ...f, outputUrl, status: 'completed' as FileStatus } : f)),
+      files: state.files.map((f) =>
+        f.id === id ? { ...f, outputUrl, outputSize: outputSize ?? null, status: 'completed' as FileStatus } : f
+      ),
+    })),
+
+  updateFilePredictedSize: (id: string, predictedSize: number) =>
+    set((state) => ({
+      files: state.files.map((f) => (f.id === id ? { ...f, predictedSize } : f)),
+    })),
+
+  updateFileDuration: (id: string, duration: number) =>
+    set((state) => ({
+      files: state.files.map((f) => (f.id === id ? { ...f, duration } : f)),
     })),
 
   updateFileError: (id: string, error: string) =>
