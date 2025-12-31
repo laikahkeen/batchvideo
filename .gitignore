@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Turbo
+.turbo
+
+# Build outputs
+apps/*/dist
+packages/*/dist

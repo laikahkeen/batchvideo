@@ -3,6 +3,11 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [master]
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/deploy.yml'
 
 permissions:
   contents: write
@@ -12,25 +17,31 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: https://laikahkeen.com/batchvideo
+      url: https://batchvideo.laikahkeen.com
     steps:
       - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
 
-      - name: Install and Build
-        run: |
-          npm install
-          npm run build
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build web app
+        run: pnpm build:web
 
       - name: Add CNAME for Pages custom domain
-        run: echo 'batchvideo.laikahkeen.com' > ./dist/CNAME
+        run: echo 'batchvideo.laikahkeen.com' > ./apps/web/dist/CNAME
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./apps/web/dist
