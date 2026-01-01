@@ -3,6 +3,7 @@
 ## Overview
 
 This plan outlines the migration of BatchVideo from a single React web application to a monorepo structure supporting:
+
 - **Web App** (React + Vite) - existing
 - **Desktop App** (Electron + React) - priority focus
 - **Mobile App** (React Native) - future consideration
@@ -10,6 +11,7 @@ This plan outlines the migration of BatchVideo from a single React web applicati
 ## Tool Selection: pnpm Workspaces + Turborepo
 
 ### Why pnpm?
+
 - **Disk efficient**: Hard links shared dependencies (saves ~70% disk space)
 - **Strict dependency resolution**: Prevents phantom dependencies
 - **Fast**: Parallel downloads, intelligent caching
@@ -18,6 +20,7 @@ This plan outlines the migration of BatchVideo from a single React web applicati
 - **Compatible**: Works seamlessly with Turborepo
 
 ### Why Turborepo?
+
 - **Build orchestration**: Manages dependencies between packages
 - **Caching**: Content-aware hashing (local + remote)
 - **Parallel execution**: Runs independent tasks concurrently
@@ -26,12 +29,13 @@ This plan outlines the migration of BatchVideo from a single React web applicati
 - **Acquired by Vercel**: Strong ecosystem and tooling
 
 ### Alternatives Considered
-| Tool | Pros | Cons |
-|------|------|------|
-| Yarn Workspaces | Mature, widely used | Slower than pnpm, phantom deps |
-| npm Workspaces | No extra install | Less features, slower |
-| Nx | Feature-rich, generators | Heavy, steeper learning curve |
-| Lerna | Popular legacy option | Deprecated patterns, now wraps npm/yarn/pnpm |
+
+| Tool            | Pros                     | Cons                                         |
+| --------------- | ------------------------ | -------------------------------------------- |
+| Yarn Workspaces | Mature, widely used      | Slower than pnpm, phantom deps               |
+| npm Workspaces  | No extra install         | Less features, slower                        |
+| Nx              | Feature-rich, generators | Heavy, steeper learning curve                |
+| Lerna           | Popular legacy option    | Deprecated patterns, now wraps npm/yarn/pnpm |
 
 ---
 
@@ -144,6 +148,7 @@ batchvideo/
 ### Step 1.1: Initialize pnpm and Workspace Configuration
 
 **Create `pnpm-workspace.yaml`:**
+
 ```yaml
 packages:
   - 'apps/*'
@@ -151,6 +156,7 @@ packages:
 ```
 
 **Create root `package.json`:**
+
 ```json
 {
   "name": "batchvideo-monorepo",
@@ -179,6 +185,7 @@ packages:
 ### Step 1.2: Create Turborepo Configuration
 
 **Create `turbo.json`:**
+
 ```json
 {
   "$schema": "https://turbo.build/schema.json",
@@ -213,6 +220,7 @@ packages:
 ### Step 1.3: Create Shared TypeScript Configuration
 
 **Create `tsconfig.base.json`:**
+
 ```json
 {
   "compilerOptions": {
@@ -247,6 +255,7 @@ packages:
 ### Step 2.1: Create `@batchvideo/shared` Package
 
 **`packages/shared/package.json`:**
+
 ```json
 {
   "name": "@batchvideo/shared",
@@ -275,6 +284,7 @@ packages:
 ```
 
 **Extract from current codebase:**
+
 - `src/types/index.ts` → `packages/shared/src/types/index.ts`
 - `src/store/useVideoStore.ts` → `packages/shared/src/store/useVideoStore.ts`
   - Remove FFmpeg-specific imports (make platform-agnostic)
@@ -283,6 +293,7 @@ packages:
 ### Step 2.2: Create `@batchvideo/ui` Package
 
 **`packages/ui/package.json`:**
+
 ```json
 {
   "name": "@batchvideo/ui",
@@ -321,6 +332,7 @@ packages:
 ```
 
 **Extract from current codebase:**
+
 - `src/components/ui/*` → `packages/ui/src/components/`
 - `src/lib/utils.ts` → `packages/ui/src/lib/utils.ts`
 - `src/hooks/use-mobile.tsx` → `packages/ui/src/hooks/`
@@ -328,6 +340,7 @@ packages:
 ### Step 2.3: Create `@batchvideo/ffmpeg-web` Package
 
 **`packages/ffmpeg-web/package.json`:**
+
 ```json
 {
   "name": "@batchvideo/ffmpeg-web",
@@ -351,6 +364,7 @@ packages:
 ```
 
 **Extract:**
+
 - `src/utils/ffmpeg.ts` → `packages/ffmpeg-web/src/ffmpeg.ts`
 
 ---
@@ -379,6 +393,7 @@ mv components.json apps/web/
 ### Step 3.2: Update Web App Dependencies
 
 **`apps/web/package.json`:**
+
 ```json
 {
   "name": "@batchvideo/web",
@@ -422,6 +437,7 @@ mv components.json apps/web/
 ### Step 3.3: Update Imports in Web App
 
 Replace local imports with workspace packages:
+
 ```typescript
 // Before
 import { useVideoStore } from './store/useVideoStore';
@@ -441,6 +457,7 @@ import { Button } from '@batchvideo/ui';
 ### Step 4.1: Create Electron App Structure
 
 **`apps/desktop/package.json`:**
+
 ```json
 {
   "name": "@batchvideo/desktop",
@@ -488,6 +505,7 @@ import { Button } from '@batchvideo/ui';
 ### Step 4.2: Electron Main Process
 
 **`apps/desktop/src/main/index.ts`:**
+
 ```typescript
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
@@ -507,8 +525,8 @@ function createWindow(): void {
       preload: path.join(__dirname, '../preload/index.js'),
       sandbox: false,
       contextIsolation: true,
-      nodeIntegration: false
-    }
+      nodeIntegration: false,
+    },
   });
 
   mainWindow.on('ready-to-show', () => {
@@ -550,6 +568,7 @@ app.on('window-all-closed', () => {
 ### Step 4.3: Native FFmpeg Integration
 
 **`packages/ffmpeg-native/package.json`:**
+
 ```json
 {
   "name": "@batchvideo/ffmpeg-native",
@@ -575,6 +594,7 @@ app.on('window-all-closed', () => {
 ```
 
 **`packages/ffmpeg-native/src/ffmpeg.ts`:**
+
 ```typescript
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegStatic from 'ffmpeg-static';
@@ -625,17 +645,14 @@ export async function processVideo(options: ProcessOptions): Promise<void> {
   });
 }
 
-export async function generateThumbnail(
-  inputPath: string,
-  outputPath: string
-): Promise<void> {
+export async function generateThumbnail(inputPath: string, outputPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
       .screenshots({
         count: 1,
         folder: require('path').dirname(outputPath),
         filename: require('path').basename(outputPath),
-        size: '320x?'
+        size: '320x?',
       })
       .on('end', () => resolve())
       .on('error', (err) => reject(err));
@@ -655,6 +672,7 @@ export async function getVideoDuration(inputPath: string): Promise<number> {
 ### Step 4.4: Electron Builder Configuration
 
 **`apps/desktop/electron-builder.json`:**
+
 ```json
 {
   "appId": "com.batchvideo.app",
@@ -663,9 +681,7 @@ export async function getVideoDuration(inputPath: string): Promise<number> {
     "buildResources": "resources",
     "output": "release"
   },
-  "files": [
-    "dist/**/*"
-  ],
+  "files": ["dist/**/*"],
   "extraResources": [
     {
       "from": "node_modules/ffmpeg-static",
@@ -707,6 +723,7 @@ export async function getVideoDuration(inputPath: string): Promise<number> {
 ### Step 5.1: Shared CI Workflow
 
 **`.github/workflows/ci.yml`:**
+
 ```yaml
 name: CI
 
@@ -744,6 +761,7 @@ jobs:
 ### Step 5.2: Web Deployment Workflow
 
 **`.github/workflows/deploy-web.yml`:**
+
 ```yaml
 name: Deploy Web
 
@@ -793,6 +811,7 @@ jobs:
 ### Step 5.3: Desktop Build Workflow
 
 **`.github/workflows/build-desktop.yml`:**
+
 ```yaml
 name: Build Desktop
 
@@ -870,6 +889,7 @@ jobs:
 ### Package Structure for Mobile
 
 **`apps/mobile/package.json`:** (Future)
+
 ```json
 {
   "name": "@batchvideo/mobile",
@@ -903,52 +923,67 @@ jobs:
 
 ## Implementation Checklist
 
-### Phase 1: Foundation (Start Here)
-- [ ] Install pnpm globally (`npm install -g pnpm`)
-- [ ] Create `pnpm-workspace.yaml`
-- [ ] Create root `package.json`
-- [ ] Install Turborepo (`pnpm add -D turbo`)
-- [ ] Create `turbo.json`
-- [ ] Create `tsconfig.base.json`
-- [ ] Update `.gitignore` for monorepo
+> **Strategy Change**: Build desktop app first, then extract shared packages only as needed.
+> This avoids premature abstraction and lets us discover what actually needs sharing.
 
-### Phase 2: Extract Shared Packages
-- [ ] Create `packages/shared/` directory structure
-- [ ] Extract types to `@batchvideo/shared`
-- [ ] Extract store logic to `@batchvideo/shared`
-- [ ] Create `packages/ui/` directory structure
-- [ ] Extract UI components to `@batchvideo/ui`
-- [ ] Create `packages/ffmpeg-web/` with current FFmpeg logic
-- [ ] Test shared packages with TypeScript
+### Phase 1: Foundation ✅ COMPLETE
 
-### Phase 3: Migrate Web App
-- [ ] Create `apps/web/` directory
-- [ ] Move current source files to `apps/web/`
-- [ ] Update `apps/web/package.json`
-- [ ] Update imports to use workspace packages
-- [ ] Update `vite.config.ts` for monorepo paths
-- [ ] Test web app still works (`pnpm dev:web`)
+- [x] Install pnpm globally (`npm install -g pnpm`)
+- [x] Create `pnpm-workspace.yaml`
+- [x] Create root `package.json`
+- [x] Install Turborepo (`pnpm add -D turbo`)
+- [x] Create `turbo.json`
+- [x] Create `tsconfig.base.json`
+- [x] Update `.gitignore` for monorepo
 
-### Phase 4: Electron Setup
-- [ ] Create `apps/desktop/` directory structure
-- [ ] Install Electron and electron-vite
-- [ ] Create main process (`src/main/`)
-- [ ] Create preload scripts (`src/preload/`)
-- [ ] Create renderer process (shared with web)
-- [ ] Create `packages/ffmpeg-native/` for native FFmpeg
-- [ ] Configure electron-builder
-- [ ] Test desktop app (`pnpm dev:desktop`)
+### Phase 2: Migrate Web App ✅ COMPLETE
+
+- [x] Create `apps/web/` directory
+- [x] Move current source files to `apps/web/`
+- [x] Update `apps/web/package.json`
+- [x] Update `vite.config.ts` for monorepo paths
+- [x] Test web app still works (`pnpm dev:web`)
+
+### Phase 3: Electron Desktop App ✅ COMPLETE
+
+- [x] Create `apps/desktop/` directory structure
+- [x] Install electron-vite and dependencies
+- [x] Create main process (`src/main/index.ts`)
+  - [x] BrowserWindow setup
+  - [x] IPC handlers for native FFmpeg
+- [x] Create preload scripts (`src/preload/index.ts`)
+  - [x] Expose FFmpeg API via contextBridge
+- [x] Create renderer process (`src/renderer/`)
+  - [x] Copy web app components (not shared yet)
+  - [x] Replace FFmpeg.wasm calls with IPC calls
+- [x] Setup native FFmpeg
+  - [x] Install fluent-ffmpeg
+  - [x] Create ffmpeg wrapper in main process
+- [x] Configure electron-builder for packaging
+- [x] Test desktop app (`pnpm dev:desktop`)
+
+### Phase 4: Extract Shared Packages (After Desktop Works)
+
+> Only extract what's actually duplicated between web and desktop
+
+- [ ] Identify duplicated code between apps/web and apps/desktop
+- [ ] Create `packages/shared/` for common types and utilities
+- [ ] Create `packages/ui/` for shared UI components (if needed)
+- [ ] Update both apps to use shared packages
+- [ ] Keep FFmpeg implementations separate (web=wasm, desktop=native)
 
 ### Phase 5: CI/CD
-- [ ] Update `.github/workflows/` for monorepo
-- [ ] Create separate deploy workflow for web
-- [ ] Create build workflow for desktop releases
-- [ ] Test GitHub Actions
+
+- [x] Update `.github/workflows/deploy.yml` for web (already works)
+- [ ] Create `build-desktop.yml` for desktop releases
+- [ ] Add matrix build (mac/win/linux)
+- [ ] Setup artifact uploads and releases
 
 ### Phase 6: Documentation
+
 - [ ] Update `README.md` for monorepo
 - [ ] Update `CLAUDE.md` for new structure
-- [ ] Create per-app README files
+- [ ] Create `apps/desktop/README.md`
 
 ---
 
@@ -966,13 +1001,13 @@ jobs:
 
 ## Estimated Effort
 
-| Phase | Description | Complexity |
-|-------|-------------|------------|
-| 1 | Foundation Setup | Low |
-| 2 | Extract Shared Packages | Medium |
-| 3 | Migrate Web App | Low |
-| 4 | Electron Setup | High |
-| 5 | CI/CD | Medium |
-| 6 | React Native (Future) | High |
+| Phase | Description             | Status     |
+| ----- | ----------------------- | ---------- |
+| 1     | Foundation Setup        | ✅ Done    |
+| 2     | Migrate Web App         | ✅ Done    |
+| 3     | Electron Desktop App    | ✅ Done    |
+| 4     | Extract Shared Packages | 🔄 Current |
+| 5     | CI/CD                   | Pending    |
+| 6     | React Native (Future)   | Future     |
 
-**Recommended approach**: Complete phases 1-3 first to validate the monorepo structure with the existing web app, then proceed to phase 4 for Electron.
+**Current approach**: Build desktop app first with duplicated code, then extract shared packages only for what's actually reused. This avoids premature abstraction.
