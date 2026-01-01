@@ -1,9 +1,9 @@
 import { useRef } from 'react';
 import { Upload, X, Palette } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { Button } from '@workspace/ui/components/ui/button';
+import { Switch } from '@workspace/ui/components/ui/switch';
+import { Label } from '@workspace/ui/components/ui/label';
+import { cn } from '@workspace/ui/lib/utils';
 import useVideoStore from '../store/useVideoStore';
 
 const LUTUpload = () => {
@@ -82,21 +82,19 @@ const LUTUpload = () => {
           <div className="space-y-0.5">
             <Label
               htmlFor="lut-only-mode"
-              className={cn(
-                "text-sm font-medium",
-                !lutFile && "text-gray-500 dark:text-gray-500"
-              )}
+              className={cn('text-sm font-medium', !lutFile && 'text-gray-500 dark:text-gray-500')}
             >
               LUT Only Mode
             </Label>
-            <p className={cn(
-              "text-xs",
-              lutFile ? "text-gray-600 dark:text-gray-400" : "text-gray-500 dark:text-gray-600"
-            )}>
+            <p
+              className={cn(
+                'text-xs',
+                lutFile ? 'text-gray-600 dark:text-gray-400' : 'text-gray-500 dark:text-gray-600'
+              )}
+            >
               {lutFile
-                ? "Apply LUT without compression (keeps original quality)"
-                : "Upload a LUT file to enable this mode"
-              }
+                ? 'Apply LUT without compression (keeps original quality)'
+                : 'Upload a LUT file to enable this mode'}
             </p>
           </div>
           <Switch

@@ -1,5 +1,5 @@
 import { CheckCircle, Loader, AlertCircle, Clock, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 
 const ProgressTracker = () => {

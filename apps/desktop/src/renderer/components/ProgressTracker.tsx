@@ -1,5 +1,5 @@
 import { CheckCircle, Loader, AlertCircle, Clock, FolderOpen } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 
 const ProgressTracker = () => {
@@ -98,9 +98,7 @@ const ProgressTracker = () => {
       </div>
 
       {!allCompleted && (
-        <div className="mt-4 text-center text-xs text-gray-400">
-          Native FFmpeg processing - 10x faster than browser
-        </div>
+        <div className="mt-4 text-center text-xs text-gray-400">Native FFmpeg processing - 10x faster than browser</div>
       )}
       {allCompleted && stats.completed > 0 && (
         <div className="mt-4 flex flex-col items-center gap-3">
@@ -108,9 +106,7 @@ const ProgressTracker = () => {
             <FolderOpen className="mr-2 h-4 w-4" />
             Open Output Folder
           </Button>
-          <p className="text-center text-xs text-green-400">
-            All videos have been processed successfully
-          </p>
+          <p className="text-center text-xs text-green-400">All videos have been processed successfully</p>
         </div>
       )}
     </div>

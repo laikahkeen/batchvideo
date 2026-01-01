@@ -8,19 +8,20 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()],
     build: {
       rollupOptions: {
-        external: ['fluent-ffmpeg']
-      }
-    }
+        external: ['fluent-ffmpeg'],
+      },
+    },
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
   },
   renderer: {
     resolve: {
       alias: {
-        '@': resolve('src/renderer')
-      }
+        '@': resolve('src/renderer'),
+        '@workspace/ui': resolve('../../packages/ui/src'),
+      },
     },
-    plugins: [react(), tailwindcss()]
-  }
+    plugins: [react(), tailwindcss()],
+  },
 });

@@ -1,5 +1,5 @@
 import { Github } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/ui/button';
 
 export default function GitHubLink() {
   return (

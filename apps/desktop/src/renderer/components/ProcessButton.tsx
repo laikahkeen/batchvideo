@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Play, FolderOpen, Trash2, XCircle, Folder } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 
 const ProcessButton = () => {
@@ -27,7 +27,7 @@ const ProcessButton = () => {
     updateFileOutput,
     updateFileError,
     clearFiles,
-    getStats
+    getStats,
   } = useVideoStore();
 
   const stats = getStats();
@@ -90,7 +90,7 @@ const ProcessButton = () => {
             maxBitrate,
             bufferSize,
             duration: file.duration || undefined,
-            fileSize: file.size
+            fileSize: file.size,
           });
 
           // Check if cancelled after processing

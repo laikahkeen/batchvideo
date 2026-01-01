@@ -1,5 +1,5 @@
 import { X, CheckCircle, AlertCircle, Loader, FolderOpen, Trash2, Upload } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 import { formatFileSize } from '../utils/format';
 import type { VideoFile } from '../types';
@@ -52,41 +52,28 @@ const FileItem = ({ file }: FileItemProps) => {
           <span>{formatFileSize(file.size)}</span>
 
           {file.status === 'completed' && file.outputSize && (
-            <span className="text-green-600 dark:text-green-400">
-              → {formatFileSize(file.outputSize)}
-            </span>
+            <span className="text-green-600 dark:text-green-400">→ {formatFileSize(file.outputSize)}</span>
           )}
           {file.status === 'processing' && file.predictedSize && (
-            <span className="text-blue-600 dark:text-blue-400">
-              → ~{formatFileSize(file.predictedSize)}
-            </span>
+            <span className="text-blue-600 dark:text-blue-400">→ ~{formatFileSize(file.predictedSize)}</span>
           )}
           {file.status === 'pending' && file.predictedSize && (
-            <span className="text-blue-600 dark:text-blue-400">
-              → ~{formatFileSize(file.predictedSize)}
-            </span>
+            <span className="text-blue-600 dark:text-blue-400">→ ~{formatFileSize(file.predictedSize)}</span>
           )}
         </div>
 
         {/* Progress bar */}
         {file.status === 'processing' && (
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-900">
-            <div
-              className="h-full bg-blue-500 transition-all duration-300"
-              style={{ width: `${file.progress}%` }}
-            />
+            <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${file.progress}%` }} />
           </div>
         )}
 
         {/* Error message */}
-        {file.status === 'error' && file.error && (
-          <p className="mt-1 text-sm text-red-400">{file.error}</p>
-        )}
+        {file.status === 'error' && file.error && <p className="mt-1 text-sm text-red-400">{file.error}</p>}
 
         {/* Progress percentage */}
-        {file.status === 'processing' && (
-          <p className="mt-1 text-xs text-gray-400">{file.progress}%</p>
-        )}
+        {file.status === 'processing' && <p className="mt-1 text-xs text-gray-400">{file.progress}%</p>}
       </div>
 
       {/* Status and actions */}
@@ -94,23 +81,13 @@ const FileItem = ({ file }: FileItemProps) => {
         {getStatusIcon()}
 
         {file.status === 'completed' && file.outputPath && (
-          <Button
-            onClick={handleShowInFolder}
-            variant="secondary"
-            size="icon"
-            title="Show in folder"
-          >
+          <Button onClick={handleShowInFolder} variant="secondary" size="icon" title="Show in folder">
             <FolderOpen className="h-4 w-4" />
           </Button>
         )}
 
         {!isProcessing && file.status !== 'processing' && (
-          <Button
-            onClick={() => removeFile(file.id)}
-            variant="destructive"
-            size="icon"
-            title="Remove file"
-          >
+          <Button onClick={() => removeFile(file.id)} variant="destructive" size="icon" title="Remove file">
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -149,9 +126,7 @@ const FileList = () => {
     <div className="space-y-3">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Files ({files.length})
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Files ({files.length})</h3>
           <p className="text-xs text-gray-500">{formatFileSize(currentTotalSize)}</p>
         </div>
         <div className="flex items-center gap-2">

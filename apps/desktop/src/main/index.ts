@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, shell, BrowserWindow, ipcMain, dialog, globalShortcut } from 'electron';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { join } from 'path';
 import { setupFFmpegHandlers } from './ffmpeg';
@@ -47,6 +47,15 @@ app.whenReady().then(() => {
   // and ignore CommandOrControl + R in production.
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window);
+  });
+
+  // Register global keyboard shortcut for DevTools toggle
+  // Cmd+Shift+I on macOS, Ctrl+Shift+I on Windows/Linux
+  globalShortcut.register('CommandOrControl+Shift+I', () => {
+    const focusedWindow = BrowserWindow.getFocusedWindow();
+    if (focusedWindow) {
+      focusedWindow.webContents.toggleDevTools();
+    }
   });
 
   // Setup IPC handlers
@@ -114,4 +123,9 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+// Cleanup global shortcuts when app quits
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
 });
