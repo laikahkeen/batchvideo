@@ -1,5 +1,5 @@
 import { Play, Download, Trash2, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 import { processVideo, loadFFmpeg } from '../utils/ffmpeg';
 

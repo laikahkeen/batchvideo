@@ -1,8 +1,8 @@
 import { Upload, X, Palette } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { Button } from '@workspace/ui/components/ui/button';
+import { Switch } from '@workspace/ui/components/ui/switch';
+import { Label } from '@workspace/ui/components/ui/label';
+import { cn } from '@workspace/ui/lib/utils';
 import useVideoStore from '../store/useVideoStore';
 
 const LUTUpload = () => {
@@ -43,9 +43,7 @@ const LUTUpload = () => {
             </div>
             <div>
               <p className="font-medium text-gray-900 dark:text-white">{lutFileName}</p>
-              <p className="max-w-[200px] truncate text-xs text-gray-600 dark:text-gray-400">
-                {lutPath}
-              </p>
+              <p className="max-w-[200px] truncate text-xs text-gray-600 dark:text-gray-400">{lutPath}</p>
             </div>
           </div>
           {!isProcessing && (

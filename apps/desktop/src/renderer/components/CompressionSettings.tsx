@@ -1,5 +1,5 @@
 import { Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 import { formatFileSize } from '../utils/format';
 import type { CompressionMethod } from '../types';
@@ -26,7 +26,7 @@ const CompressionSettings = () => {
     setBufferSize,
     setPreset,
     setCodec,
-    setResolution
+    setResolution,
   } = useVideoStore();
 
   // Calculate estimated file sizes based on compression method
@@ -101,12 +101,8 @@ const CompressionSettings = () => {
           {compressionMethod === 'percentage' && (
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Target Size (%)
-                </label>
-                <span className="text-sm font-medium text-blue-500 dark:text-blue-400">
-                  {targetPercentage}%
-                </span>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Target Size (%)</label>
+                <span className="text-sm font-medium text-blue-500 dark:text-blue-400">{targetPercentage}%</span>
               </div>
               <input
                 type="range"
@@ -159,12 +155,8 @@ const CompressionSettings = () => {
             <div className="space-y-4">
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Quality (CRF Value)
-                  </label>
-                  <span className="text-sm font-medium text-blue-500 dark:text-blue-400">
-                    {qualityCrf}
-                  </span>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Quality (CRF Value)</label>
+                  <span className="text-sm font-medium text-blue-500 dark:text-blue-400">{qualityCrf}</span>
                 </div>
                 <input
                   type="range"
@@ -202,9 +194,7 @@ const CompressionSettings = () => {
                   <option value="slower">Slower</option>
                   <option value="veryslow">Very Slow</option>
                 </select>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Slower = better compression efficiency
-                </p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Slower = better compression efficiency</p>
               </div>
 
               <div>
@@ -246,9 +236,7 @@ const CompressionSettings = () => {
 
           {/* Codec Selection */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Codec
-            </label>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Codec</label>
             <div className="grid grid-cols-2 gap-3">
               <Button
                 onClick={() => setCodec('h264')}

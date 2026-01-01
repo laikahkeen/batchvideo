@@ -1,8 +1,15 @@
 import { useEffect, useRef } from 'react';
 import { X, CheckCircle, AlertCircle, Loader, Download, Trash2, Upload } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
-import { formatFileSize, generateThumbnail, getVideoDuration, calculatePredictedSize, checkFileSizeLimit, MAX_TOTAL_SIZE } from '../utils/ffmpeg';
+import {
+  formatFileSize,
+  generateThumbnail,
+  getVideoDuration,
+  calculatePredictedSize,
+  checkFileSizeLimit,
+  MAX_TOTAL_SIZE,
+} from '../utils/ffmpeg';
 import type { VideoFile } from '../types';
 
 interface FileItemProps {
@@ -88,30 +95,26 @@ const FileItem = ({ file }: FileItemProps) => {
 
           {/* Show predicted/actual output size */}
           {file.status === 'completed' && file.outputSize && (
-            <span className="text-green-600 dark:text-green-400">
-              → {formatFileSize(file.outputSize)}
-            </span>
+            <span className="text-green-600 dark:text-green-400">→ {formatFileSize(file.outputSize)}</span>
           )}
           {file.status === 'processing' && file.predictedSize && (
-            <span className="text-blue-600 dark:text-blue-400">
-              → ~{formatFileSize(file.predictedSize)}
-            </span>
+            <span className="text-blue-600 dark:text-blue-400">→ ~{formatFileSize(file.predictedSize)}</span>
           )}
           {file.status === 'pending' && file.predictedSize && (
-            <span className="text-blue-600 dark:text-blue-400">
-              → ~{formatFileSize(file.predictedSize)}
-            </span>
+            <span className="text-blue-600 dark:text-blue-400">→ ~{formatFileSize(file.predictedSize)}</span>
           )}
           {/* Show appropriate message when prediction is not available */}
-          {(file.status === 'pending' || file.status === 'processing') && file.predictedSize === null && !useVideoStore.getState().isLutOnlyMode && (
-            <span className="text-gray-500 dark:text-gray-500">
-              {(() => {
-                const state = useVideoStore.getState();
-                const isCrfMode = state.compressionMethod === 'quality';
-                return isCrfMode ? '→ Size varies' : '→ Calculating...';
-              })()}
-            </span>
-          )}
+          {(file.status === 'pending' || file.status === 'processing') &&
+            file.predictedSize === null &&
+            !useVideoStore.getState().isLutOnlyMode && (
+              <span className="text-gray-500 dark:text-gray-500">
+                {(() => {
+                  const state = useVideoStore.getState();
+                  const isCrfMode = state.compressionMethod === 'quality';
+                  return isCrfMode ? '→ Size varies' : '→ Calculating...';
+                })()}
+              </span>
+            )}
         </div>
 
         {/* Progress bar */}
@@ -160,7 +163,7 @@ const FileList = () => {
     qualityCrf,
     isLutOnlyMode,
     updateFilePredictedSize,
-    updateFileDuration
+    updateFileDuration,
   } = useVideoStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -217,7 +220,15 @@ const FileList = () => {
     }, 300); // 300ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [compressionMethod, targetPercentage, targetSizePerMinute, qualityCrf, isLutOnlyMode, updateFilePredictedSize, updateFileDuration]);
+  }, [
+    compressionMethod,
+    targetPercentage,
+    targetSizePerMinute,
+    qualityCrf,
+    isLutOnlyMode,
+    updateFilePredictedSize,
+    updateFileDuration,
+  ]);
 
   if (files.length === 0) {
     return (
@@ -242,10 +253,10 @@ const FileList = () => {
     if (!sizeCheck.withinLimit) {
       alert(
         `Total file size exceeds 2GB limit.\n\n` +
-        `Current files: ${formatFileSize(sizeCheck.currentSize)}\n` +
-        `New files: ${formatFileSize(sizeCheck.newSize)}\n` +
-        `Total: ${formatFileSize(sizeCheck.totalSize)}\n\n` +
-        `Please remove some files or upload smaller files.`
+          `Current files: ${formatFileSize(sizeCheck.currentSize)}\n` +
+          `New files: ${formatFileSize(sizeCheck.newSize)}\n` +
+          `Total: ${formatFileSize(sizeCheck.totalSize)}\n\n` +
+          `Please remove some files or upload smaller files.`
       );
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;

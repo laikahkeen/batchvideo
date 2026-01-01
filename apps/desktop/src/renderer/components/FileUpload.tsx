@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Upload, Video, Loader, CheckCircle, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/ui/button';
 import useVideoStore from '../store/useVideoStore';
 import { formatFileSize } from '../utils/format';
 
@@ -65,12 +65,8 @@ const FileUpload = () => {
           <>
             <Video className="h-16 w-16 text-gray-400 dark:text-gray-500" />
             <div>
-              <p className="mb-2 text-xl font-medium text-gray-700 dark:text-gray-200">
-                Click to select video files
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Supports MP4, MOV, MTS, M4V, AVI, MKV, WebM
-              </p>
+              <p className="mb-2 text-xl font-medium text-gray-700 dark:text-gray-200">Click to select video files</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Supports MP4, MOV, MTS, M4V, AVI, MKV, WebM</p>
             </div>
             <Button variant="secondary" size="lg" className="mt-4">
               <Upload className="mr-2 h-5 w-5" />
