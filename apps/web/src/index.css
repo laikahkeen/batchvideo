@@ -1,4 +1,4 @@
 @import 'tailwindcss';
-@import '@workspace/ui/styles/globals.css';
+@import '@workspace/shared/styles/globals.css';
 
 @import 'tw-animate-css';

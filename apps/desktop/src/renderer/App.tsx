@@ -1,13 +1,17 @@
 import { Video } from 'lucide-react';
-import FileUpload from './components/FileUpload';
-import FileList from './components/FileList';
-import LUTUpload from './components/LUTUpload';
-import CompressionSettings from './components/CompressionSettings';
-import ProgressTracker from './components/ProgressTracker';
-import ProcessButton from './components/ProcessButton';
-import ThemeToggle from './components/ThemeToggle';
-import { ThemeProvider } from './components/theme-provider';
-import useVideoStore from './store/useVideoStore';
+import {
+  FileUpload,
+  FileList,
+  LUTUpload,
+  CompressionSettings,
+  ProgressTracker,
+  ProcessButton,
+  ThemeToggle,
+  ThemeProvider,
+} from '@workspace/shared/components';
+import { PlatformProvider } from '@workspace/shared/platform';
+import useVideoStore from '@workspace/shared/store';
+import { desktopAdapter } from './platform';
 
 function AppContent() {
   const { isProcessing, files } = useVideoStore();
@@ -118,7 +122,9 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="batchvideo-theme">
-      <AppContent />
+      <PlatformProvider adapter={desktopAdapter}>
+        <AppContent />
+      </PlatformProvider>
     </ThemeProvider>
   );
 }

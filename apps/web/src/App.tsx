@@ -1,15 +1,20 @@
 import { Video } from 'lucide-react';
-import FileUpload from './components/FileUpload';
-import FileList from './components/FileList';
-import LUTUpload from './components/LUTUpload';
-import CompressionSettings from './components/CompressionSettings';
-import ProgressTracker from './components/ProgressTracker';
-import ProcessButton from './components/ProcessButton';
-import ThemeToggle from './components/ThemeToggle';
-import GitHubLink from './components/GitHubLink';
-import useVideoStore from './store/useVideoStore';
+import {
+  FileUpload,
+  FileList,
+  LUTUpload,
+  CompressionSettings,
+  ProgressTracker,
+  ProcessButton,
+  ThemeToggle,
+  GitHubLink,
+  ThemeProvider,
+} from '@workspace/shared/components';
+import { PlatformProvider } from '@workspace/shared/platform';
+import useVideoStore from '@workspace/shared/store';
+import { webAdapter } from './platform';
 
-function App() {
+function AppContent() {
   const { isProcessing, files } = useVideoStore();
   const hasFiles = files.length > 0;
 
@@ -107,6 +112,16 @@ function App() {
       {/* Process Button - Sticky Footer */}
       <ProcessButton />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider defaultTheme="dark" storageKey="batchvideo-theme">
+      <PlatformProvider adapter={webAdapter}>
+        <AppContent />
+      </PlatformProvider>
+    </ThemeProvider>
   );
 }
 

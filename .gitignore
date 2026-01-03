@@ -29,5 +29,5 @@ dist-ssr
 # Build outputs
 apps/*/dist
 apps/*/out
-apps/desktop/tsconfig.web.tsbuildinfo
+*.tsbuildinfo
 packages/*/dist

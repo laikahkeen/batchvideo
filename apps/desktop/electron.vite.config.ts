@@ -19,7 +19,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@': resolve('src/renderer'),
-        '@workspace/ui': resolve('../../packages/ui/src'),
+        '@workspace/shared': resolve('../../packages/shared/src'),
       },
     },
     plugins: [react(), tailwindcss()],
