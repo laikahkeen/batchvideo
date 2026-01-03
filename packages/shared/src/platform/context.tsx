@@ -5,18 +5,8 @@
  * Each app wraps its root with PlatformProvider and supplies the appropriate adapter.
  */
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react';
-import type {
-  PlatformAdapter,
-  PlatformContextValue,
-  FFmpegStatus,
-} from './types';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import type { PlatformAdapter, PlatformContextValue, FFmpegStatus } from './types';
 
 // ============================================================================
 // Context
@@ -77,11 +67,7 @@ export function PlatformProvider({ adapter, children }: PlatformProviderProps) {
     isInitializing,
   };
 
-  return (
-    <PlatformContext.Provider value={value}>
-      {children}
-    </PlatformContext.Provider>
-  );
+  return <PlatformContext.Provider value={value}>{children}</PlatformContext.Provider>;
 }
 
 // ============================================================================

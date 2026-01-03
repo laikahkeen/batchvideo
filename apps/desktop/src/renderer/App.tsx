@@ -1,17 +1,16 @@
 import { Video } from 'lucide-react';
-import {
-  FileUpload,
-  FileList,
-  LUTUpload,
-  CompressionSettings,
-  ProgressTracker,
-  ProcessButton,
-  ThemeToggle,
-  ThemeProvider,
-} from '@workspace/shared/components';
+import FileUpload from '@workspace/shared/components/FileUpload';
+import FileList from '@workspace/shared/components/FileList';
+import LUTUpload from '@workspace/shared/components/LUTUpload';
+import CompressionSettings from '@workspace/shared/components/CompressionSettings';
+import ProgressTracker from '@workspace/shared/components/ProgressTracker';
+import ProcessButton from '@workspace/shared/components/ProcessButton';
+import ThemeToggle from '@workspace/shared/components/ThemeToggle';
+import { ThemeProvider } from '@workspace/shared/components/theme-provider';
+
 import { PlatformProvider } from '@workspace/shared/platform';
-import useVideoStore from '@workspace/shared/store';
-import { desktopAdapter } from './platform';
+import useVideoStore from '@workspace/shared/store/useVideoStore';
+import { desktopAdapter } from './platform/desktopAdapter';
 
 function AppContent() {
   const { isProcessing, files } = useVideoStore();
@@ -54,9 +53,7 @@ function AppContent() {
         <div className="mx-auto max-w-3xl px-6 py-8">
           {/* Info Section */}
           <div className="mb-8 rounded-xl border border-blue-200/50 bg-linear-to-r from-blue-50 to-purple-50 p-6 dark:border-blue-800/30 dark:from-blue-900/20 dark:to-purple-900/20">
-            <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
-              Native Performance
-            </h3>
+            <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Native Performance</h3>
             <div className="grid gap-4 text-sm text-gray-700 md:grid-cols-3 dark:text-gray-300">
               <div>
                 <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 font-bold text-white">

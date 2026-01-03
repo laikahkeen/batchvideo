@@ -15,8 +15,8 @@ import type {
   Codec,
   Resolution,
   LutSource,
-} from '../types';
-import { calculateOverallProgress, calculateStats } from '../utils';
+} from '@workspace/shared/types';
+import { calculateOverallProgress, calculateStats } from '@workspace/shared/utils';
 
 // ============================================================================
 // Store Implementation
@@ -90,11 +90,9 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
   // Compression Settings Actions
   // -------------------------------------------------------------------------
 
-  setCompressionMethod: (method: CompressionMethod) =>
-    set({ compressionMethod: method }),
+  setCompressionMethod: (method: CompressionMethod) => set({ compressionMethod: method }),
 
-  setTargetPercentage: (percentage: number) =>
-    set({ targetPercentage: percentage }),
+  setTargetPercentage: (percentage: number) => set({ targetPercentage: percentage }),
 
   setTargetSizePerMinute: (size: number) => set({ targetSizePerMinute: size }),
 
@@ -142,9 +140,7 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
 
   updateFilePredictedSize: (id: string, predictedSize: number) =>
     set((state) => ({
-      files: state.files.map((f) =>
-        f.id === id ? { ...f, predictedSize } : f
-      ),
+      files: state.files.map((f) => (f.id === id ? { ...f, predictedSize } : f)),
     })),
 
   updateFileDuration: (id: string, duration: number) =>
@@ -154,9 +150,7 @@ const useVideoStore = create<VideoStoreState>((set, get) => ({
 
   updateFileError: (id: string, error: string) =>
     set((state) => ({
-      files: state.files.map((f) =>
-        f.id === id ? { ...f, error, status: 'error' as FileStatus } : f
-      ),
+      files: state.files.map((f) => (f.id === id ? { ...f, error, status: 'error' as FileStatus } : f)),
     })),
 
   updateFileThumbnail: (id: string, thumbnail: string) =>
@@ -191,4 +185,4 @@ export default useVideoStore;
 // Re-exports
 // ============================================================================
 
-export { calculateOverallProgress, calculateStats } from '../utils';
+export { calculateOverallProgress, calculateStats } from '@workspace/shared/utils';

@@ -191,14 +191,7 @@ export interface VideoMetadata {
 // Constants
 // ============================================================================
 
-export const ACCEPTED_VIDEO_EXTENSIONS = [
-  '.mp4',
-  '.mov',
-  '.mts',
-  '.m4v',
-  '.avi',
-  '.mkv',
-] as const;
+export const ACCEPTED_VIDEO_EXTENSIONS = ['.mp4', '.mov', '.mts', '.m4v', '.avi', '.mkv'] as const;
 
 export const ACCEPTED_VIDEO_MIME_TYPES = [
   'video/mp4',

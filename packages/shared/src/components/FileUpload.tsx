@@ -8,19 +8,19 @@
 import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, Video, Loader, AlertCircle, CheckCircle } from 'lucide-react';
-import { Button } from './ui/button';
-import { usePlatform, usePlatformCapabilities } from '../platform';
-import useVideoStore from '../store';
-import { formatFileSize } from '../utils';
-import type { VideoFile } from '../types';
-import { ACCEPTED_VIDEO_EXTENSIONS } from '../types';
+import { Button } from '@workspace/shared/components/ui/button';
+import { usePlatform, usePlatformCapabilities } from '@workspace/shared/platform';
+import useVideoStore from '@workspace/shared/store/useVideoStore';
+import { formatFileSize } from '@workspace/shared/utils';
+import type { VideoFile } from '@workspace/shared/types';
+import { ACCEPTED_VIDEO_EXTENSIONS } from '@workspace/shared/types';
 
 const FileUpload = () => {
   const { adapter, ffmpegStatus, isInitializing } = usePlatform();
   const { supportsDragDrop, maxFileSize } = usePlatformCapabilities();
   const { files, addFiles, isProcessing } = useVideoStore();
 
-  const currentTotalSize = files.reduce((sum, f) => sum + f.size, 0);
+  const currentTotalSize = files.reduce((sum: number, f: VideoFile) => sum + f.size, 0);
   const isDisabled = isProcessing || isInitializing || !ffmpegStatus.available;
 
   // Check if adding files would exceed size limit
@@ -37,7 +37,7 @@ const FileUpload = () => {
       const fileInfos = await adapter.selectFiles();
       if (fileInfos.length === 0) return;
 
-      const totalNewSize = fileInfos.reduce((sum, f) => sum + f.size, 0);
+      const totalNewSize = fileInfos.reduce((sum: number, f) => sum + f.size, 0);
       if (!checkSizeLimit(totalNewSize)) {
         alert(
           `Total file size exceeds ${formatFileSize(maxFileSize!)} limit.\n\n` +
@@ -50,20 +50,22 @@ const FileUpload = () => {
       }
 
       // Convert FileInputInfo to VideoFile
-      const newFiles: VideoFile[] = fileInfos.map((info) => ({
-        id: info.id,
-        name: info.name,
-        size: info.size,
-        source: info.source,
-        duration: null,
-        thumbnail: null,
-        status: 'pending',
-        progress: 0,
-        output: null,
-        outputSize: null,
-        predictedSize: null,
-        error: null,
-      }));
+      const newFiles: VideoFile[] = fileInfos.map(
+        (info: { id: string; name: string; size: number; source: File | string }) => ({
+          id: info.id,
+          name: info.name,
+          size: info.size,
+          source: info.source,
+          duration: null,
+          thumbnail: null,
+          status: 'pending',
+          progress: 0,
+          output: null,
+          outputSize: null,
+          predictedSize: null,
+          error: null,
+        })
+      );
 
       addFiles(newFiles);
 
@@ -111,20 +113,22 @@ const FileUpload = () => {
       try {
         const fileInfos = await adapter.handleDroppedFiles(acceptedFiles);
 
-        const newFiles: VideoFile[] = fileInfos.map((info) => ({
-          id: info.id,
-          name: info.name,
-          size: info.size,
-          source: info.source,
-          duration: null,
-          thumbnail: null,
-          status: 'pending',
-          progress: 0,
-          output: null,
-          outputSize: null,
-          predictedSize: null,
-          error: null,
-        }));
+        const newFiles: VideoFile[] = fileInfos.map(
+          (info: { id: string; name: string; size: number; source: File | string }) => ({
+            id: info.id,
+            name: info.name,
+            size: info.size,
+            source: info.source,
+            duration: null,
+            thumbnail: null,
+            status: 'pending',
+            progress: 0,
+            output: null,
+            outputSize: null,
+            predictedSize: null,
+            error: null,
+          })
+        );
 
         addFiles(newFiles);
 
@@ -209,13 +213,9 @@ const FileUpload = () => {
             <Video className="h-16 w-16 text-gray-400 dark:text-gray-500" />
             <div>
               <p className="mb-2 text-xl font-medium text-gray-700 dark:text-gray-200">
-                {supportsDragDrop
-                  ? 'Drop video files here or click to browse'
-                  : 'Click to select video files'}
+                {supportsDragDrop ? 'Drop video files here or click to browse' : 'Click to select video files'}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Supports MP4, MOV, MTS, M4V, AVI, MKV
-              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Supports MP4, MOV, MTS, M4V, AVI, MKV</p>
             </div>
             {adapter.type === 'desktop' && (
               <Button variant="secondary" size="lg" className="mt-4">
@@ -234,8 +234,7 @@ const FileUpload = () => {
               <p>Recommended: 1-5 files, under 5 minutes each, 1080p or lower</p>
               <p className="mt-1">Processing happens in your browser - keep this tab open</p>
               <p className="mt-1 font-medium">
-                Max total size: 2GB{' '}
-                {files.length > 0 && `(Current: ${formatFileSize(currentTotalSize)})`}
+                Max total size: 2GB {files.length > 0 && `(Current: ${formatFileSize(currentTotalSize)})`}
               </p>
             </>
           ) : (

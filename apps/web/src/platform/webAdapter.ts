@@ -124,7 +124,7 @@ export const webAdapter: PlatformAdapter = {
   // File Metadata
   // ---------------------------------------------------------------------------
 
-  async getVideoDuration(file): Promise<number> {
+  async getVideoDuration(file: File | string): Promise<number> {
     if (typeof file === 'string') {
       // Web adapter only handles File objects
       return 0;
@@ -154,7 +154,7 @@ export const webAdapter: PlatformAdapter = {
     });
   },
 
-  async generateThumbnail(file): Promise<string | null> {
+  async generateThumbnail(file: File | string): Promise<string | null> {
     if (typeof file === 'string') {
       return null;
     }
@@ -206,7 +206,7 @@ export const webAdapter: PlatformAdapter = {
 
   async processVideo(
     _jobId: string,
-    file,
+    file: File | string,
     options: ProcessingOptions,
     onProgress: (progress: number) => void
   ): Promise<ProcessingResult> {
@@ -302,10 +302,7 @@ export const webAdapter: PlatformAdapter = {
 
           if (options.maxBitrate && options.maxBitrate > 0) {
             args.push('-maxrate', `${options.maxBitrate}k`);
-            const bufSize =
-              options.bufferSize && options.bufferSize > 0
-                ? options.bufferSize
-                : options.maxBitrate * 2;
+            const bufSize = options.bufferSize && options.bufferSize > 0 ? options.bufferSize : options.maxBitrate * 2;
             args.push('-bufsize', `${bufSize}k`);
           }
         }

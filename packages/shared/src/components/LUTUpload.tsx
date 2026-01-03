@@ -7,12 +7,12 @@
 
 import { useRef } from 'react';
 import { Upload, X, Palette } from 'lucide-react';
-import { Button } from './ui/button';
-import { Switch } from './ui/switch';
-import { Label } from './ui/label';
-import { cn } from '../lib/utils';
-import { usePlatform } from '../platform';
-import useVideoStore from '../store';
+import { Button } from '@workspace/shared/components/ui/button';
+import { Switch } from '@workspace/shared/components/ui/switch';
+import { Label } from '@workspace/shared/components/ui/label';
+import { cn } from '@workspace/shared/lib/utils';
+import { usePlatform } from '@workspace/shared/platform';
+import useVideoStore from '@workspace/shared/store/useVideoStore';
 
 const LUTUpload = () => {
   const { adapter } = usePlatform();
@@ -100,9 +100,7 @@ const LUTUpload = () => {
             <div>
               <p className="font-medium text-gray-900 dark:text-white">{lutInfo.name}</p>
               {lutInfo.size !== null && (
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  {(lutInfo.size / 1024).toFixed(1)} KB
-                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">{(lutInfo.size / 1024).toFixed(1)} KB</p>
               )}
             </div>
           </div>

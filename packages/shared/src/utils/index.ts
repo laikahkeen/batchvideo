@@ -2,7 +2,7 @@
  * Shared utility functions for BatchVideo
  */
 
-import type { FileStatus, ProcessingStats } from '../types';
+import type { FileStatus, ProcessingStats } from '@workspace/shared/types';
 
 // ============================================================================
 // File Size Formatting
@@ -115,9 +115,7 @@ export function calculateOverallProgress(files: FileWithProgress[]): number {
   }, 0);
 
   const result = Math.round(totalProgress / files.length);
-  return isNaN(result) || !isFinite(result)
-    ? 0
-    : Math.min(Math.max(result, 0), 100);
+  return isNaN(result) || !isFinite(result) ? 0 : Math.min(Math.max(result, 0), 100);
 }
 
 export function calculateStats(files: FileWithProgress[]): ProcessingStats {
@@ -146,33 +144,21 @@ export function generateUniqueId(): string {
 // Bitrate Calculation
 // ============================================================================
 
-export function calculateTargetBitrate(
-  targetSizeMB: number,
-  durationSeconds: number
-): number {
+export function calculateTargetBitrate(targetSizeMB: number, durationSeconds: number): number {
   if (durationSeconds <= 0) return 0;
   const bitsPerSecond = (targetSizeMB * 8 * 1024 * 1024) / durationSeconds;
   return Math.round(bitsPerSecond / 1000);
 }
 
-export function estimateOutputSize(
-  bitrateKbps: number,
-  durationSeconds: number
-): number {
+export function estimateOutputSize(bitrateKbps: number, durationSeconds: number): number {
   return Math.round((bitrateKbps * 1000 * durationSeconds) / 8);
 }
 
-export function calculateTargetSizeFromPercentage(
-  originalSize: number,
-  targetPercentage: number
-): number {
+export function calculateTargetSizeFromPercentage(originalSize: number, targetPercentage: number): number {
   return Math.round((originalSize * targetPercentage) / 100);
 }
 
-export function calculateTargetSizeFromSizePerMinute(
-  sizePerMinuteMB: number,
-  durationSeconds: number
-): number {
+export function calculateTargetSizeFromSizePerMinute(sizePerMinuteMB: number, durationSeconds: number): number {
   const durationMinutes = durationSeconds / 60;
   return Math.round(sizePerMinuteMB * durationMinutes * 1024 * 1024);
 }
@@ -181,18 +167,12 @@ export function calculateTargetSizeFromSizePerMinute(
 // Percentage Helpers
 // ============================================================================
 
-export function calculateCompressionRatio(
-  originalSize: number,
-  outputSize: number
-): number {
+export function calculateCompressionRatio(originalSize: number, outputSize: number): number {
   if (originalSize === 0) return 0;
   return Math.round((outputSize / originalSize) * 100);
 }
 
-export function calculateSavings(
-  originalSize: number,
-  outputSize: number
-): number {
+export function calculateSavings(originalSize: number, outputSize: number): number {
   if (originalSize === 0) return 0;
   return Math.round(((originalSize - outputSize) / originalSize) * 100);
 }
@@ -201,10 +181,7 @@ export function calculateSavings(
 // String Helpers
 // ============================================================================
 
-export function truncateFilename(
-  filename: string,
-  maxLength: number = 30
-): string {
+export function truncateFilename(filename: string, maxLength: number = 30): string {
   if (filename.length <= maxLength) return filename;
 
   const ext = getFileExtension(filename);
@@ -214,4 +191,46 @@ export function truncateFilename(
   if (availableLength < 5) return filename.substring(0, maxLength - 3) + '...';
 
   return name.substring(0, availableLength) + '...' + ext;
+}
+
+// ============================================================================
+// Predicted Size Calculation
+// ============================================================================
+
+export interface PredictedSizeOptions {
+  compressionMethod: 'percentage' | 'size_per_minute' | 'quality';
+  targetPercentage?: number;
+  targetSizePerMinute?: number;
+  qualityCrf?: number;
+}
+
+export function calculatePredictedSize(
+  fileSize: number,
+  durationSeconds: number,
+  options: PredictedSizeOptions
+): number | null {
+  if (!durationSeconds || durationSeconds <= 0) return null;
+
+  const durationMin = durationSeconds / 60;
+
+  switch (options.compressionMethod) {
+    case 'percentage': {
+      if (!options.targetPercentage) return null;
+      return Math.round(fileSize * (options.targetPercentage / 100));
+    }
+
+    case 'size_per_minute': {
+      if (!options.targetSizePerMinute) return null;
+      const targetSizeMB = options.targetSizePerMinute * durationMin;
+      return Math.round(targetSizeMB * 1024 * 1024);
+    }
+
+    case 'quality': {
+      // CRF mode: file size cannot be accurately predicted
+      return null;
+    }
+
+    default:
+      return null;
+  }
 }

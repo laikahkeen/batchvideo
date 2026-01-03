@@ -1,7 +1,7 @@
 import { Settings } from 'lucide-react';
-import { Button } from './ui/button';
-import useVideoStore from '../store';
-import type { CompressionMethod, FFmpegPreset, Resolution } from '../types';
+import { Button } from '@workspace/shared/components/ui/button';
+import useVideoStore from '@workspace/shared/store/useVideoStore';
+import type { CompressionMethod, FFmpegPreset, Resolution } from '@workspace/shared/types';
 
 const CompressionSettings = () => {
   const {
@@ -48,7 +48,7 @@ const CompressionSettings = () => {
 
   const getTotalEstimatedSize = () => {
     if (files.length === 0) return null;
-    const total = files.reduce((sum, file) => {
+    const total = files.reduce((sum: number, file: (typeof files)[0]) => {
       const estimate = getEstimatedSize(file);
       return sum + (estimate ? parseFloat(estimate) : 0);
     }, 0);
@@ -66,9 +66,7 @@ const CompressionSettings = () => {
 
       {isLutOnlyMode && (
         <div className="mb-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-950/20">
-          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-            LUT Only Mode Active
-          </p>
+          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">LUT Only Mode Active</p>
           <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
             Compression settings are disabled. Only LUT will be applied.
           </p>
@@ -84,25 +82,18 @@ const CompressionSettings = () => {
             </label>
             <select
               value={compressionMethod}
-              onChange={(e) =>
-                setCompressionMethod(e.target.value as CompressionMethod)
-              }
+              onChange={(e) => setCompressionMethod(e.target.value as CompressionMethod)}
               disabled={isProcessing}
               className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             >
               <option value="quality">Target quality (CRF value)</option>
               <option value="percentage">Target file size (Percentage)</option>
-              <option value="size_per_minute">
-                Target file size (MB per minute)
-              </option>
+              <option value="size_per_minute">Target file size (MB per minute)</option>
             </select>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {compressionMethod === 'percentage' &&
-                'Compress to a percentage of the original file size'}
-              {compressionMethod === 'size_per_minute' &&
-                'Set consistent quality across all videos by MB per minute'}
-              {compressionMethod === 'quality' &&
-                'Maintain visual quality with optional bitrate constraints'}
+              {compressionMethod === 'percentage' && 'Compress to a percentage of the original file size'}
+              {compressionMethod === 'size_per_minute' && 'Set consistent quality across all videos by MB per minute'}
+              {compressionMethod === 'quality' && 'Maintain visual quality with optional bitrate constraints'}
             </p>
           </div>
 
@@ -110,12 +101,8 @@ const CompressionSettings = () => {
           {compressionMethod === 'percentage' && (
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Target Size (%)
-                </label>
-                <span className="text-sm font-medium text-blue-500 dark:text-blue-400">
-                  {targetPercentage}%
-                </span>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Target Size (%)</label>
+                <span className="text-sm font-medium text-blue-500 dark:text-blue-400">{targetPercentage}%</span>
               </div>
               <input
                 type="range"
@@ -134,8 +121,7 @@ const CompressionSettings = () => {
               {files.length > 0 && (
                 <div className="mt-3 rounded-lg bg-gray-100 p-3 dark:bg-gray-800">
                   <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                    Estimated total: ~{getTotalEstimatedSize()} MB ({files.length}{' '}
-                    file{files.length > 1 ? 's' : ''})
+                    Estimated total: ~{getTotalEstimatedSize()} MB ({files.length} file{files.length > 1 ? 's' : ''})
                   </p>
                 </div>
               )}
@@ -155,8 +141,7 @@ const CompressionSettings = () => {
                 step="5"
                 value={targetSizePerMinute ?? ''}
                 onChange={(e) => {
-                  const newValue =
-                    e.target.value === '' ? 5 : Number(e.target.value);
+                  const newValue = e.target.value === '' ? 5 : Number(e.target.value);
                   setTargetSizePerMinute(newValue);
                 }}
                 disabled={isProcessing}
@@ -168,8 +153,7 @@ const CompressionSettings = () => {
               {files.length > 0 && (
                 <div className="mt-3 rounded-lg bg-gray-100 p-3 dark:bg-gray-800">
                   <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                    Estimated total: ~{getTotalEstimatedSize()} MB (varies by
-                    video duration)
+                    Estimated total: ~{getTotalEstimatedSize()} MB (varies by video duration)
                   </p>
                 </div>
               )}
@@ -181,12 +165,8 @@ const CompressionSettings = () => {
             <div className="space-y-4">
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Quality (CRF Value)
-                  </label>
-                  <span className="text-sm font-medium text-blue-500 dark:text-blue-400">
-                    {qualityCrf}
-                  </span>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Quality (CRF Value)</label>
+                  <span className="text-sm font-medium text-blue-500 dark:text-blue-400">{qualityCrf}</span>
                 </div>
                 <input
                   type="range"
@@ -237,8 +217,7 @@ const CompressionSettings = () => {
                   step="100"
                   value={maxBitrate ?? ''}
                   onChange={(e) => {
-                    const newValue =
-                      e.target.value === '' ? 0 : Number(e.target.value);
+                    const newValue = e.target.value === '' ? 0 : Number(e.target.value);
                     setMaxBitrate(newValue);
                   }}
                   disabled={isProcessing}
@@ -257,8 +236,7 @@ const CompressionSettings = () => {
                   step="100"
                   value={bufferSize ?? ''}
                   onChange={(e) => {
-                    const newValue =
-                      e.target.value === '' ? 0 : Number(e.target.value);
+                    const newValue = e.target.value === '' ? 0 : Number(e.target.value);
                     setBufferSize(newValue);
                   }}
                   disabled={isProcessing}
@@ -270,9 +248,7 @@ const CompressionSettings = () => {
 
           {/* Codec Selection */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Codec
-            </label>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Codec</label>
             <div className="grid grid-cols-2 gap-3">
               <Button
                 onClick={() => setCodec('h264')}
@@ -319,8 +295,7 @@ const CompressionSettings = () => {
       {!isLutOnlyMode && codec === 'h265' && (
         <div className="mt-6 rounded-lg p-3 text-xs">
           <p className="text-yellow-700 dark:text-yellow-400">
-            H.265 provides better compression but may have compatibility issues
-            on older devices
+            H.265 provides better compression but may have compatibility issues on older devices
           </p>
         </div>
       )}

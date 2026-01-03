@@ -37,14 +37,12 @@
   "exports": {
     "./globals.css": "./src/styles/globals.css",
     "./lib/*": "./src/lib/*.ts",
-    "./components": "./src/components/index.ts",
     "./components/*": "./src/components/*.tsx",
     "./components/ui/*": "./src/components/ui/*.tsx",
-    "./hooks": "./src/hooks/index.ts",
     "./hooks/*": "./src/hooks/*.ts",
+    "./store/*": "./src/store/*.ts",
     "./types": "./src/types/index.ts",
     "./utils": "./src/utils/index.ts",
-    "./store": "./src/store/index.ts",
     "./platform": "./src/platform/index.ts"
   }
 }

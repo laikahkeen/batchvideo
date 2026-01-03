@@ -5,7 +5,7 @@
  */
 
 import { Github } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from '@workspace/shared/components/ui/button';
 
 export default function GitHubLink() {
   return (

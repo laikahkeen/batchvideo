@@ -6,21 +6,12 @@
  */
 
 import { useEffect } from 'react';
-import {
-  X,
-  CheckCircle,
-  AlertCircle,
-  Loader,
-  Download,
-  FolderOpen,
-  Trash2,
-  Upload,
-} from 'lucide-react';
-import { Button } from './ui/button';
-import { usePlatform, usePlatformCapabilities } from '../platform';
-import useVideoStore from '../store';
-import { formatFileSize } from '../utils';
-import type { VideoFile } from '../types';
+import { X, CheckCircle, AlertCircle, Loader, Download, FolderOpen, Trash2, Upload } from 'lucide-react';
+import { Button } from '@workspace/shared/components/ui/button';
+import { usePlatform, usePlatformCapabilities } from '@workspace/shared/platform';
+import useVideoStore from '@workspace/shared/store/useVideoStore';
+import { formatFileSize } from '@workspace/shared/utils';
+import type { VideoFile } from '@workspace/shared/types';
 
 // ============================================================================
 // FileItem Component
@@ -33,8 +24,7 @@ interface FileItemProps {
 const FileItem = ({ file }: FileItemProps) => {
   const { adapter } = usePlatform();
   const { supportsShowInFolder } = usePlatformCapabilities();
-  const { removeFile, isProcessing, updateFileThumbnail, compressionMethod, isLutOnlyMode } =
-    useVideoStore();
+  const { removeFile, isProcessing, updateFileThumbnail, compressionMethod, isLutOnlyMode } = useVideoStore();
 
   // Generate thumbnail if not available
   useEffect(() => {
@@ -106,14 +96,10 @@ const FileItem = ({ file }: FileItemProps) => {
 
           {/* Show predicted/actual output size */}
           {file.status === 'completed' && file.outputSize && (
-            <span className="text-green-600 dark:text-green-400">
-              → {formatFileSize(file.outputSize)}
-            </span>
+            <span className="text-green-600 dark:text-green-400">→ {formatFileSize(file.outputSize)}</span>
           )}
           {(file.status === 'processing' || file.status === 'pending') && file.predictedSize && (
-            <span className="text-blue-600 dark:text-blue-400">
-              → ~{formatFileSize(file.predictedSize)}
-            </span>
+            <span className="text-blue-600 dark:text-blue-400">→ ~{formatFileSize(file.predictedSize)}</span>
           )}
           {/* Show appropriate message when prediction is not available */}
           {(file.status === 'pending' || file.status === 'processing') &&
@@ -128,17 +114,12 @@ const FileItem = ({ file }: FileItemProps) => {
         {/* Progress bar */}
         {file.status === 'processing' && (
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-900">
-            <div
-              className="h-full bg-blue-500 transition-all duration-300"
-              style={{ width: `${file.progress}%` }}
-            />
+            <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${file.progress}%` }} />
           </div>
         )}
 
         {/* Error message */}
-        {file.status === 'error' && file.error && (
-          <p className="mt-1 text-sm text-red-400">{file.error}</p>
-        )}
+        {file.status === 'error' && file.error && <p className="mt-1 text-sm text-red-400">{file.error}</p>}
 
         {/* Progress percentage */}
         {file.status === 'processing' && <p className="mt-1 text-xs text-gray-400">{file.progress}%</p>}
@@ -151,21 +132,11 @@ const FileItem = ({ file }: FileItemProps) => {
         {file.status === 'completed' && file.output && (
           <>
             {supportsShowInFolder && adapter.showInFolder ? (
-              <Button
-                onClick={handleShowInFolder}
-                variant="secondary"
-                size="icon"
-                title="Show in folder"
-              >
+              <Button onClick={handleShowInFolder} variant="secondary" size="icon" title="Show in folder">
                 <FolderOpen className="h-4 w-4" />
               </Button>
             ) : (
-              <Button
-                onClick={handleDownload}
-                variant="secondary"
-                size="icon"
-                title="Download processed video"
-              >
+              <Button onClick={handleDownload} variant="secondary" size="icon" title="Download processed video">
                 <Download className="h-4 w-4" />
               </Button>
             )}
@@ -173,12 +144,7 @@ const FileItem = ({ file }: FileItemProps) => {
         )}
 
         {!isProcessing && file.status !== 'processing' && (
-          <Button
-            onClick={() => removeFile(file.id)}
-            variant="destructive"
-            size="icon"
-            title="Remove file"
-          >
+          <Button onClick={() => removeFile(file.id)} variant="destructive" size="icon" title="Remove file">
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -215,8 +181,8 @@ const FileList = () => {
       const fileInfos = await adapter.selectFiles();
       if (fileInfos.length === 0) return;
 
-      const totalNewSize = fileInfos.reduce((sum, f) => sum + f.size, 0);
-      const currentTotalSize = files.reduce((sum, f) => sum + f.size, 0);
+      const totalNewSize = fileInfos.reduce((sum: number, f) => sum + f.size, 0);
+      const currentTotalSize = files.reduce((sum: number, f: VideoFile) => sum + f.size, 0);
 
       if (maxFileSize !== null && currentTotalSize + totalNewSize > maxFileSize) {
         alert(
@@ -229,20 +195,22 @@ const FileList = () => {
         return;
       }
 
-      const newFiles: VideoFile[] = fileInfos.map((info) => ({
-        id: info.id,
-        name: info.name,
-        size: info.size,
-        source: info.source,
-        duration: null,
-        thumbnail: null,
-        status: 'pending',
-        progress: 0,
-        output: null,
-        outputSize: null,
-        predictedSize: null,
-        error: null,
-      }));
+      const newFiles: VideoFile[] = fileInfos.map(
+        (info: { id: string; name: string; size: number; source: File | string }) => ({
+          id: info.id,
+          name: info.name,
+          size: info.size,
+          source: info.source,
+          duration: null,
+          thumbnail: null,
+          status: 'pending',
+          progress: 0,
+          output: null,
+          outputSize: null,
+          predictedSize: null,
+          error: null,
+        })
+      );
 
       addFiles(newFiles);
 
@@ -269,16 +237,14 @@ const FileList = () => {
     }
   };
 
-  const currentTotalSize = files.reduce((sum, f) => sum + f.size, 0);
+  const currentTotalSize = files.reduce((sum: number, f: VideoFile) => sum + f.size, 0);
   const remainingSize = maxFileSize !== null ? maxFileSize - currentTotalSize : null;
 
   return (
     <div className="space-y-3">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Files ({files.length})
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Files ({files.length})</h3>
           <p className="text-xs text-gray-500">
             {formatFileSize(currentTotalSize)}
             {maxFileSize !== null && ` / ${formatFileSize(maxFileSize)}`}
@@ -301,7 +267,7 @@ const FileList = () => {
         </div>
       </div>
 
-      {files.map((file) => (
+      {files.map((file: VideoFile) => (
         <FileItem key={file.id} file={file} />
       ))}
     </div>

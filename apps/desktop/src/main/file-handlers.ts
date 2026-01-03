@@ -16,7 +16,7 @@ export function setupFileHandlers(): void {
     return {
       path: filePath,
       name: path.basename(filePath),
-      size: stats.size
+      size: stats.size,
     };
   });
 
@@ -40,15 +40,12 @@ export function setupFileHandlers(): void {
   });
 
   // Create output path
-  ipcMain.handle(
-    'file:createOutputPath',
-    async (_, inputPath: string, outputDir?: string): Promise<string> => {
-      const inputName = path.basename(inputPath, path.extname(inputPath));
-      const dir = outputDir || path.dirname(inputPath);
-      const outputName = `${inputName}_processed.mp4`;
-      return path.join(dir, outputName);
-    }
-  );
+  ipcMain.handle('file:createOutputPath', async (_, inputPath: string, outputDir?: string): Promise<string> => {
+    const inputName = path.basename(inputPath, path.extname(inputPath));
+    const dir = outputDir || path.dirname(inputPath);
+    const outputName = `${inputName}_processed.mp4`;
+    return path.join(dir, outputName);
+  });
 
   // Open file in system
   ipcMain.handle('file:openInSystem', async (_, filePath: string): Promise<void> => {

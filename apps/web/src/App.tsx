@@ -1,18 +1,18 @@
 import { Video } from 'lucide-react';
-import {
-  FileUpload,
-  FileList,
-  LUTUpload,
-  CompressionSettings,
-  ProgressTracker,
-  ProcessButton,
-  ThemeToggle,
-  GitHubLink,
-  ThemeProvider,
-} from '@workspace/shared/components';
+
+import GitHubLink from '@workspace/shared/components/GitHubLink';
+import ThemeToggle from '@workspace/shared/components/ThemeToggle';
+import FileUpload from '@workspace/shared/components/FileUpload';
+import FileList from '@workspace/shared/components/FileList';
+import ProgressTracker from '@workspace/shared/components/ProgressTracker';
+import LUTUpload from '@workspace/shared/components/LUTUpload';
+import CompressionSettings from '@workspace/shared/components/CompressionSettings';
+import ProcessButton from '@workspace/shared/components/ProcessButton';
+import { ThemeProvider } from '@workspace/shared/components/theme-provider';
+
 import { PlatformProvider } from '@workspace/shared/platform';
-import useVideoStore from '@workspace/shared/store';
-import { webAdapter } from './platform';
+import useVideoStore from '@workspace/shared/store/useVideoStore';
+import { webAdapter } from './platform/webAdapter';
 
 function AppContent() {
   const { isProcessing, files } = useVideoStore();

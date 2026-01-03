@@ -41,15 +41,10 @@ export interface FFmpegAPI {
   check: () => Promise<FFmpegStatus>;
   getMetadata: (inputPath: string) => Promise<VideoMetadata>;
   generateThumbnail: (inputPath: string) => Promise<string | null>;
-  process: (
-    jobId: string,
-    options: ProcessOptions
-  ) => Promise<{ outputPath: string; size: number }>;
+  process: (jobId: string, options: ProcessOptions) => Promise<{ outputPath: string; size: number }>;
   cancel: (jobId: string) => Promise<boolean>;
   cancelAll: () => Promise<number>;
-  onProgress: (
-    callback: (data: { jobId: string; progress: number }) => void
-  ) => () => void;
+  onProgress: (callback: (data: { jobId: string; progress: number }) => void) => () => void;
 }
 
 export interface FileAPI {

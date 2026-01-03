@@ -6,9 +6,10 @@
  */
 
 import { CheckCircle, Loader, AlertCircle, Clock, Download } from 'lucide-react';
-import { Button } from './ui/button';
-import { usePlatform } from '../platform';
-import useVideoStore from '../store';
+import { Button } from '@workspace/shared/components/ui/button';
+import { usePlatform } from '@workspace/shared/platform';
+import useVideoStore from '@workspace/shared/store/useVideoStore';
+import type { VideoFile } from '@workspace/shared/types';
 
 const ProgressTracker = () => {
   const { adapter } = usePlatform();
@@ -25,9 +26,9 @@ const ProgressTracker = () => {
   const allCompleted = stats.completed + stats.error === stats.total;
 
   const handleDownloadAll = () => {
-    const completedFiles = files.filter((f) => f.status === 'completed' && f.output);
+    const completedFiles = files.filter((f: VideoFile) => f.status === 'completed' && f.output);
 
-    completedFiles.forEach((file, index) => {
+    completedFiles.forEach((file: VideoFile, index: number) => {
       setTimeout(() => {
         adapter.downloadOutput(file.output!, `processed_${file.name}`);
       }, index * 200); // Stagger downloads slightly
@@ -113,16 +114,12 @@ const ProgressTracker = () => {
             <Download className="mr-2 h-4 w-4" />
             Download All ({stats.completed} {stats.completed === 1 ? 'file' : 'files'})
           </Button>
-          <p className="text-center text-xs text-green-400">
-            All videos have been processed successfully
-          </p>
+          <p className="text-center text-xs text-green-400">All videos have been processed successfully</p>
         </div>
       )}
       {allCompleted && stats.completed > 0 && adapter.type !== 'web' && (
         <div className="mt-4 flex flex-col items-center gap-3">
-          <p className="text-center text-xs text-green-400">
-            All videos have been processed successfully
-          </p>
+          <p className="text-center text-xs text-green-400">All videos have been processed successfully</p>
         </div>
       )}
     </div>

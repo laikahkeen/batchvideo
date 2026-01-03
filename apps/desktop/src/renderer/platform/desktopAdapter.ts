@@ -77,7 +77,7 @@ export const desktopAdapter: PlatformAdapter = {
   // File Metadata
   // ---------------------------------------------------------------------------
 
-  async getVideoDuration(file): Promise<number> {
+  async getVideoDuration(file: File | string): Promise<number> {
     if (typeof file !== 'string') {
       // Desktop adapter only handles file paths
       return 0;
@@ -92,7 +92,7 @@ export const desktopAdapter: PlatformAdapter = {
     }
   },
 
-  async generateThumbnail(file): Promise<string | null> {
+  async generateThumbnail(file: File | string): Promise<string | null> {
     if (typeof file !== 'string') {
       return null;
     }
@@ -111,7 +111,7 @@ export const desktopAdapter: PlatformAdapter = {
 
   async processVideo(
     jobId: string,
-    file,
+    file: File | string,
     options: ProcessingOptions,
     onProgress: (progress: number) => void
   ): Promise<ProcessingResult> {

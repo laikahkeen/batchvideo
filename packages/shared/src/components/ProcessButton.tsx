@@ -6,10 +6,11 @@
  */
 
 import { Play, Download, FolderOpen, Trash2, XCircle, Folder } from 'lucide-react';
-import { Button } from './ui/button';
-import { usePlatform, usePlatformCapabilities } from '../platform';
-import useVideoStore from '../store';
-import type { ProcessingOptions } from '../platform/types';
+import { Button } from '@workspace/shared/components/ui/button';
+import { usePlatform, usePlatformCapabilities } from '@workspace/shared/platform';
+import useVideoStore from '@workspace/shared/store/useVideoStore';
+import type { ProcessingOptions } from '@workspace/shared/platform';
+import type { VideoFile } from '@workspace/shared/types';
 
 const ProcessButton = () => {
   const { adapter } = usePlatform();
@@ -92,14 +93,9 @@ const ProcessButton = () => {
             fileSize: file.size,
           };
 
-          const result = await adapter.processVideo(
-            file.id,
-            file.source,
-            options,
-            (progress: number) => {
-              updateFileProgress(file.id, Math.round(progress));
-            }
-          );
+          const result = await adapter.processVideo(file.id, file.source, options, (progress: number) => {
+            updateFileProgress(file.id, Math.round(progress));
+          });
 
           // Check if cancelled after processing
           if (useVideoStore.getState().isCancelled) {
@@ -134,9 +130,9 @@ const ProcessButton = () => {
   };
 
   const handleDownloadAll = () => {
-    const completedFiles = files.filter((f) => f.status === 'completed' && f.output);
+    const completedFiles = files.filter((f: VideoFile) => f.status === 'completed' && f.output);
 
-    completedFiles.forEach((file, index) => {
+    completedFiles.forEach((file: VideoFile, index: number) => {
       setTimeout(() => {
         adapter.downloadOutput(file.output!, `processed_${file.name}`);
       }, index * 200); // Stagger downloads slightly
@@ -146,7 +142,7 @@ const ProcessButton = () => {
   const handleOpenOutputFolder = async () => {
     if (!adapter.showInFolder) return;
 
-    const completedFile = files.find((f) => f.status === 'completed' && f.output);
+    const completedFile = files.find((f: VideoFile) => f.status === 'completed' && f.output);
     if (completedFile?.output) {
       await adapter.showInFolder(completedFile.output);
     }

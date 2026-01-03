@@ -5,12 +5,7 @@
  * to enable unified components across all platforms.
  */
 
-import type {
-  Codec,
-  Resolution,
-  FFmpegPreset,
-  CompressionMethod,
-} from '../types';
+import type { Codec, Resolution, FFmpegPreset, CompressionMethod } from '@workspace/shared/types';
 
 // ============================================================================
 // Platform Types

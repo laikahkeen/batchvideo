@@ -1,17 +1,13 @@
 import { Moon, Sun } from 'lucide-react';
-import { useTheme } from './theme-provider';
-import { Button } from './ui/button';
+import { useTheme } from '@workspace/shared/components/theme-provider';
+import { Button } from '@workspace/shared/components/ui/button';
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
     const currentTheme =
-      theme === 'system'
-        ? window.matchMedia('(prefers-color-scheme: dark)').matches
-          ? 'dark'
-          : 'light'
-        : theme;
+      theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
 
     setTheme(currentTheme === 'dark' ? 'light' : 'dark');
   };
