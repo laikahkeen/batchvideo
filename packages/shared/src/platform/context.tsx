@@ -24,39 +24,14 @@ interface PlatformProviderProps {
 }
 
 export function PlatformProvider({ adapter, children }: PlatformProviderProps) {
-  const [ffmpegStatus, setFFmpegStatus] = useState<FFmpegStatus>({
-    available: false,
+  // FFmpeg loads lazily on first use - assume available until proven otherwise
+  const [ffmpegStatus] = useState<FFmpegStatus>({
+    available: true,
   });
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [isInitializing] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-
-    const initFFmpeg = async () => {
-      try {
-        setIsInitializing(true);
-        const status = await adapter.initFFmpeg();
-        if (mounted) {
-          setFFmpegStatus(status);
-        }
-      } catch (error) {
-        if (mounted) {
-          setFFmpegStatus({
-            available: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
-        }
-      } finally {
-        if (mounted) {
-          setIsInitializing(false);
-        }
-      }
-    };
-
-    initFFmpeg();
-
     return () => {
-      mounted = false;
       adapter.cleanup?.();
     };
   }, [adapter]);

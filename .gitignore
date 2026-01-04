@@ -29,5 +29,6 @@ dist-ssr
 # Build outputs
 apps/*/dist
 apps/*/out
+apps/*/release
 *.tsbuildinfo
 packages/*/dist

@@ -12,7 +12,8 @@
     "dev:web": "turbo dev --filter=@batchvideo/web",
     "dev:desktop": "turbo dev --filter=@batchvideo/desktop",
     "build:web": "turbo build --filter=@batchvideo/web",
-    "build:desktop": "turbo build --filter=@batchvideo/desktop"
+    "build:desktop": "turbo build --filter=@batchvideo/desktop",
+    "package:mac": "turbo package:mac --filter=@batchvideo/desktop"
   },
   "devDependencies": {
     "turbo": "^2.3.3",

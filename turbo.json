@@ -7,7 +7,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**", "out/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {
       "cache": false,
@@ -22,6 +22,21 @@
       "inputs": ["$TURBO_DEFAULT$", "tsconfig.json"]
     },
     "clean": {
+      "cache": false
+    },
+    "package:mac": {
+      "dependsOn": ["build"],
+      "outputs": ["release/**"],
+      "cache": false
+    },
+    "package:win": {
+      "dependsOn": ["build"],
+      "outputs": ["release/**"],
+      "cache": false
+    },
+    "package:linux": {
+      "dependsOn": ["build"],
+      "outputs": ["release/**"],
       "cache": false
     }
   }
