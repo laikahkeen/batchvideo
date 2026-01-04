@@ -4,6 +4,10 @@
   "private": true,
   "description": "BatchVideo Desktop - Native video batch processing",
   "author": "Lai Kah Keen <laikahkeen@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/laikahkeen/batchvideo.git"
+  },
   "main": "out/main/index.js",
   "type": "module",
   "scripts": {
