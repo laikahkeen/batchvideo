@@ -114,9 +114,6 @@ importers:
       '@workspace/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      lucide-react:
-        specifier: ^0.562.0
-        version: 0.562.0(react@19.2.3)
       react:
         specifier: ^19.2.0
         version: 19.2.3
@@ -154,9 +151,15 @@ importers:
       globals:
         specifier: ^16.5.0
         version: 16.5.0
+      lucide-react:
+        specifier: ^0.562.0
+        version: 0.562.0(react@19.2.3)
       tailwindcss:
         specifier: ^4.1.18
         version: 4.1.18
+      tw-animate-css:
+        specifier: ^1.4.0
+        version: 1.4.0
       typescript:
         specifier: ^5.7.3
         version: 5.9.3

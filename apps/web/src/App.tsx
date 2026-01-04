@@ -1,5 +1,6 @@
 import { Video } from 'lucide-react';
 
+import DownloadApp from '@workspace/shared/components/DownloadApp';
 import GitHubLink from '@workspace/shared/components/GitHubLink';
 import ThemeToggle from '@workspace/shared/components/ThemeToggle';
 import FileUpload from '@workspace/shared/components/FileUpload';
@@ -40,6 +41,7 @@ function AppContent() {
                   Processing...
                 </span>
               )}
+              <DownloadApp />
               <GitHubLink />
               <ThemeToggle />
             </div>
