@@ -9,6 +9,11 @@
   "files": [
     "out/**/*"
   ],
+  "publish": {
+    "provider": "github",
+    "owner": "laikahkeen",
+    "repo": "batchvideo"
+  },
   "asarUnpack": [
     "resources/**",
     "node_modules/ffmpeg-static/**",

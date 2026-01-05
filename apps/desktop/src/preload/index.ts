@@ -103,6 +103,7 @@ const api = {
   file: fileAPI,
   dialog: dialogAPI,
   platform: process.platform,
+  getVersion: (): string => ipcRenderer.sendSync('app:getVersion'),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

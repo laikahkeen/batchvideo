@@ -72,6 +72,7 @@ export interface API {
   file: FileAPI;
   dialog: DialogAPI;
   platform: NodeJS.Platform;
+  getVersion: () => string;
 }
 
 declare global {

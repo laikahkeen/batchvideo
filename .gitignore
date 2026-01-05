@@ -32,3 +32,6 @@ apps/*/out
 apps/*/release
 *.tsbuildinfo
 packages/*/dist
+
+# claude plan
+.claude/plans

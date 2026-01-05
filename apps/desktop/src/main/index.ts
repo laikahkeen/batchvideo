@@ -3,6 +3,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { join } from 'path';
 import { setupFFmpegHandlers } from './ffmpeg';
 import { setupFileHandlers } from './file-handlers';
+import { setupAutoUpdater } from './auto-updater';
+import { createAppMenu } from './menu';
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -61,6 +63,15 @@ app.whenReady().then(() => {
   // Setup IPC handlers
   setupFFmpegHandlers();
   setupFileHandlers();
+
+  // Setup auto-updater and app menu
+  setupAutoUpdater();
+  createAppMenu();
+
+  // App version handler
+  ipcMain.on('app:getVersion', (event) => {
+    event.returnValue = app.getVersion();
+  });
 
   // Handle file dialog
   ipcMain.handle('dialog:openFiles', async () => {
