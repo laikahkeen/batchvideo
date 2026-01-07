@@ -214,6 +214,9 @@ const FileList = () => {
 
       addFiles(newFiles);
 
+      // Track analytics
+      adapter.analytics.trackFilesAdded(newFiles.length, totalNewSize);
+
       // Fetch metadata in background
       newFiles.forEach(async (file) => {
         try {

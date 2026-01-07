@@ -13,7 +13,10 @@
     "dev:desktop": "turbo dev --filter=@batchvideo/desktop",
     "build:web": "turbo build --filter=@batchvideo/web",
     "build:desktop": "turbo build --filter=@batchvideo/desktop",
-    "package:mac": "turbo package:mac --filter=@batchvideo/desktop"
+    "package:mac": "turbo package:mac --filter=@batchvideo/desktop",
+    "typecheck:web": "turbo typecheck --filter=@batchvideo/web",
+    "typecheck:desktop": "turbo typecheck --filter=@batchvideo/desktop",
+    "typecheck:shared": "turbo typecheck --filter=@workspace/shared"
   },
   "devDependencies": {
     "turbo": "^2.3.3",

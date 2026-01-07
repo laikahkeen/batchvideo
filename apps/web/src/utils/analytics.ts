@@ -109,4 +109,8 @@ export function trackError(errorType: string, message: string): void {
   trackEvent(AnalyticsEvents.ERROR_OCCURRED, { error_type: errorType, message });
 }
 
+export function trackHeroDismissed(): void {
+  trackEvent(AnalyticsEvents.HERO_DISMISSED, {});
+}
+
 export { AnalyticsEvents };

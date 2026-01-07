@@ -8,6 +8,7 @@
 import { MessageSquare } from 'lucide-react';
 import { Button } from '@workspace/shared/components/ui/button';
 import { usePlatform } from '@workspace/shared/platform';
+import { GITHUB_ISSUES_NEW_URL } from '@workspace/shared/constants/urls';
 
 export default function FeedbackLink() {
   const { adapter } = usePlatform();
@@ -19,7 +20,7 @@ export default function FeedbackLink() {
   return (
     <Button variant="outline" size="icon" asChild>
       <a
-        href="https://github.com/laikahkeen/batchvideo/issues/new"
+        href={GITHUB_ISSUES_NEW_URL}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Send Feedback"

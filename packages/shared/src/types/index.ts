@@ -254,6 +254,9 @@ export const AnalyticsEvents = {
 
   // Errors
   ERROR_OCCURRED: 'error_occurred',
+
+  // UI events
+  HERO_DISMISSED: 'hero_dismissed',
 } as const;
 
 export type AnalyticsEvent = (typeof AnalyticsEvents)[keyof typeof AnalyticsEvents];
@@ -290,6 +293,7 @@ export interface AnalyticsEventData {
     error_type: string;
     message: string;
   };
+  [AnalyticsEvents.HERO_DISMISSED]: Record<string, never>;
 }
 
 /**

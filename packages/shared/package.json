@@ -39,10 +39,12 @@
     "./lib/*": "./src/lib/*.ts",
     "./components/*": "./src/components/*.tsx",
     "./components/ui/*": "./src/components/ui/*.tsx",
+    "./constants/*": "./src/constants/*.ts",
     "./hooks/*": "./src/hooks/*.ts",
     "./store/*": "./src/store/*.ts",
     "./types": "./src/types/index.ts",
     "./utils": "./src/utils/index.ts",
+    "./utils/*": "./src/utils/*.ts",
     "./platform": "./src/platform/index.ts"
   }
 }

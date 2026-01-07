@@ -6,12 +6,13 @@
 
 import { Github } from 'lucide-react';
 import { Button } from '@workspace/shared/components/ui/button';
+import { GITHUB_REPO_URL } from '@workspace/shared/constants/urls';
 
 export default function GitHubLink() {
   return (
     <Button variant="outline" size="icon" asChild>
       <a
-        href="https://github.com/laikahkeen/batchvideo"
+        href={GITHUB_REPO_URL}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="View on GitHub"
