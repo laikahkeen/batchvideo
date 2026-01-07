@@ -67,10 +67,28 @@ export interface DialogAPI {
   selectOutputFolder: () => Promise<string | null>;
 }
 
+export interface UpdaterStatus {
+  status: string;
+  version?: string;
+  progress?: number;
+  error?: string;
+}
+
+export interface UpdaterAPI {
+  checkForUpdates: () => Promise<void>;
+  onStatus: (callback: (data: UpdaterStatus) => void) => () => void;
+}
+
+export interface AnalyticsAPI {
+  track: (event: string, properties?: Record<string, unknown>) => void;
+}
+
 export interface API {
   ffmpeg: FFmpegAPI;
   file: FileAPI;
   dialog: DialogAPI;
+  updater: UpdaterAPI;
+  analytics: AnalyticsAPI;
   platform: NodeJS.Platform;
   getVersion: () => string;
 }

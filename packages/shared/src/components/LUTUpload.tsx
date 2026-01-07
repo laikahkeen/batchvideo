@@ -42,6 +42,7 @@ const LUTUpload = () => {
     const file = e.target.files?.[0];
     if (file && file.name.endsWith('.cube')) {
       setLut(file);
+      adapter.analytics.trackLutApplied(file.name);
     } else if (file) {
       alert('Please upload a .cube LUT file');
     }

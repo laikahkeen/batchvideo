@@ -5,6 +5,7 @@ import { setupFFmpegHandlers } from './ffmpeg';
 import { setupFileHandlers } from './file-handlers';
 import { setupAutoUpdater } from './auto-updater';
 import { createAppMenu } from './menu';
+import { initAnalytics, shutdownAnalytics, trackEventRaw } from './analytics';
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -44,6 +45,9 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.batchvideo.app');
+
+  // Initialize analytics
+  initAnalytics();
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -120,6 +124,11 @@ app.whenReady().then(() => {
     return result.filePaths[0] || null;
   });
 
+  // Analytics IPC handler (accepts any event string from renderer)
+  ipcMain.on('analytics:track', (_, event: string, properties?: Record<string, unknown>) => {
+    trackEventRaw(event, properties);
+  });
+
   createWindow();
 
   app.on('activate', function () {
@@ -136,7 +145,8 @@ app.on('window-all-closed', () => {
   }
 });
 
-// Cleanup global shortcuts when app quits
-app.on('will-quit', () => {
+// Cleanup global shortcuts and shutdown analytics when app quits
+app.on('will-quit', async () => {
   globalShortcut.unregisterAll();
+  await shutdownAnalytics();
 });

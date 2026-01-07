@@ -11,6 +11,7 @@ import type {
   ProcessingOptions,
   ProcessingResult,
 } from '@workspace/shared/platform';
+import { AnalyticsEvents } from '@workspace/shared/types';
 
 // ============================================================================
 // Desktop Platform Adapter Implementation
@@ -194,6 +195,31 @@ export const desktopAdapter: PlatformAdapter = {
   maxFileSize: null, // No limit on desktop
   supportsOutputDirectory: true,
   supportsShowInFolder: true,
+
+  // ---------------------------------------------------------------------------
+  // Analytics (sends events to main process via IPC)
+  // ---------------------------------------------------------------------------
+
+  analytics: {
+    trackFilesAdded(count: number, totalSize: number): void {
+      window.api.analytics.track(AnalyticsEvents.FILES_ADDED, { count, total_size: totalSize });
+    },
+    trackLutApplied(lutName: string): void {
+      window.api.analytics.track(AnalyticsEvents.LUT_APPLIED, { lut_name: lutName });
+    },
+    trackVideosProcessed(count: number): void {
+      window.api.analytics.track(AnalyticsEvents.VIDEOS_PROCESSED, { count });
+    },
+    trackDownloadClicked(): void {
+      window.api.analytics.track(AnalyticsEvents.DOWNLOAD_CLICKED, {});
+    },
+    trackFeedbackClicked(): void {
+      window.api.analytics.track(AnalyticsEvents.FEEDBACK_CLICKED, {});
+    },
+    trackError(errorType: string, message: string): void {
+      window.api.analytics.track(AnalyticsEvents.ERROR_OCCURRED, { error_type: errorType, message });
+    },
+  },
 
   // ---------------------------------------------------------------------------
   // Cleanup

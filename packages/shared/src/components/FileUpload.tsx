@@ -69,6 +69,10 @@ const FileUpload = () => {
 
       addFiles(newFiles);
 
+      // Track analytics
+      const totalSize = newFiles.reduce((sum, f) => sum + f.size, 0);
+      adapter.analytics.trackFilesAdded(newFiles.length, totalSize);
+
       // Fetch metadata in background
       newFiles.forEach(async (file) => {
         try {
@@ -131,6 +135,10 @@ const FileUpload = () => {
         );
 
         addFiles(newFiles);
+
+        // Track analytics
+        const totalSize = newFiles.reduce((sum, f) => sum + f.size, 0);
+        adapter.analytics.trackFilesAdded(newFiles.length, totalSize);
 
         // Fetch metadata in background
         newFiles.forEach(async (file) => {

@@ -1,5 +1,6 @@
 import { app, Menu, shell, MenuItemConstructorOptions } from 'electron';
 import { checkForUpdates } from './auto-updater';
+import { trackFeedbackClicked } from './analytics';
 
 export function createAppMenu(): void {
   const isMac = process.platform === 'darwin';
@@ -77,6 +78,13 @@ export function createAppMenu(): void {
         {
           label: 'Learn More',
           click: () => shell.openExternal('https://batchvideo.laikahkeen.com'),
+        },
+        {
+          label: 'Send Feedback',
+          click: () => {
+            trackFeedbackClicked();
+            shell.openExternal('https://github.com/laikahkeen/batchvideo/issues/new');
+          },
         },
         ...(!isMac
           ? ([

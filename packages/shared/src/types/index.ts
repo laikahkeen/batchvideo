@@ -228,3 +228,72 @@ export const PRESET_MAP: Record<FFmpegPreset, string> = {
 
 /** 2GB in bytes - web browser memory limit */
 export const WEB_MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024;
+
+// ============================================================================
+// Analytics
+// ============================================================================
+
+export type AnalyticsPlatform = 'web' | 'desktop';
+export type AnalyticsEnv = 'development' | 'production';
+
+/**
+ * Analytics event names - shared between web and desktop
+ */
+export const AnalyticsEvents = {
+  // App lifecycle
+  APP_OPENED: 'app_opened',
+
+  // Video processing
+  VIDEOS_PROCESSED: 'videos_processed',
+
+  // User actions
+  FILES_ADDED: 'files_added',
+  LUT_APPLIED: 'lut_applied',
+  DOWNLOAD_CLICKED: 'download_clicked',
+  FEEDBACK_CLICKED: 'feedback_clicked',
+
+  // Errors
+  ERROR_OCCURRED: 'error_occurred',
+} as const;
+
+export type AnalyticsEvent = (typeof AnalyticsEvents)[keyof typeof AnalyticsEvents];
+
+/**
+ * Base properties included with every event
+ */
+export interface AnalyticsBaseProperties {
+  platform: AnalyticsPlatform;
+  env: AnalyticsEnv;
+  version: string;
+}
+
+/**
+ * Event-specific property types
+ */
+export interface AnalyticsEventData {
+  [AnalyticsEvents.APP_OPENED]: {
+    arch?: string;
+  };
+  [AnalyticsEvents.VIDEOS_PROCESSED]: {
+    count: number;
+  };
+  [AnalyticsEvents.FILES_ADDED]: {
+    count: number;
+    total_size: number;
+  };
+  [AnalyticsEvents.LUT_APPLIED]: {
+    lut_name: string;
+  };
+  [AnalyticsEvents.DOWNLOAD_CLICKED]: Record<string, never>;
+  [AnalyticsEvents.FEEDBACK_CLICKED]: Record<string, never>;
+  [AnalyticsEvents.ERROR_OCCURRED]: {
+    error_type: string;
+    message: string;
+  };
+}
+
+/**
+ * Full event properties (base + event-specific)
+ */
+export type AnalyticsEventProperties<E extends AnalyticsEvent> = AnalyticsBaseProperties &
+  AnalyticsEventData[E];

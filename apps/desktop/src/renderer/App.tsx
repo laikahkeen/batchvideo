@@ -6,6 +6,8 @@ import CompressionSettings from '@workspace/shared/components/CompressionSetting
 import ProgressTracker from '@workspace/shared/components/ProgressTracker';
 import ProcessButton from '@workspace/shared/components/ProcessButton';
 import ThemeToggle from '@workspace/shared/components/ThemeToggle';
+import FeedbackLink from '@workspace/shared/components/FeedbackLink';
+import GitHubLink from '@workspace/shared/components/GitHubLink';
 import { ThemeProvider } from '@workspace/shared/components/theme-provider';
 
 import { PlatformProvider } from '@workspace/shared/platform';
@@ -42,6 +44,8 @@ function AppContent() {
                   Processing...
                 </span>
               )}
+              <FeedbackLink />
+              <GitHubLink />
               <ThemeToggle />
             </div>
           </div>
@@ -106,9 +110,7 @@ function AppContent() {
           <div className="text-center text-sm text-gray-600 dark:text-gray-500">
             <p>Native FFmpeg processing - 10x faster than browser</p>
             <p className="mt-2">No file size limits - process files of any size</p>
-            <p className="mt-3 text-xs text-gray-400 dark:text-gray-600">
-              v{window.api.getVersion()}
-            </p>
+            <p className="mt-3 text-xs text-gray-400 dark:text-gray-600">v{window.api.getVersion()}</p>
           </div>
         </div>
       </main>

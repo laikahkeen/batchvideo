@@ -202,6 +202,22 @@ export interface PlatformAdapter {
   supportsShowInFolder: boolean;
 
   // -------------------------------------------------------------------------
+  // Analytics
+  // -------------------------------------------------------------------------
+
+  /**
+   * Analytics tracking methods (implemented by each platform)
+   */
+  analytics: {
+    trackFilesAdded(count: number, totalSize: number): void;
+    trackLutApplied(lutName: string): void;
+    trackVideosProcessed(count: number): void;
+    trackDownloadClicked(): void;
+    trackFeedbackClicked(): void;
+    trackError(errorType: string, message: string): void;
+  };
+
+  // -------------------------------------------------------------------------
   // Cleanup
   // -------------------------------------------------------------------------
 

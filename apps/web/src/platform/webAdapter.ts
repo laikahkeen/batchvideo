@@ -15,6 +15,7 @@ import type {
 } from '@workspace/shared/platform';
 import { generateUniqueId, calculateTargetBitrate } from '@workspace/shared/utils';
 import { WEB_MAX_FILE_SIZE } from '@workspace/shared/types';
+import * as analytics from '../utils/analytics';
 
 // FFmpeg instance singleton
 let ffmpegInstance: FFmpeg | null = null;
@@ -383,6 +384,19 @@ export const webAdapter: PlatformAdapter = {
   maxFileSize: WEB_MAX_FILE_SIZE,
   supportsOutputDirectory: false,
   supportsShowInFolder: false,
+
+  // ---------------------------------------------------------------------------
+  // Analytics
+  // ---------------------------------------------------------------------------
+
+  analytics: {
+    trackFilesAdded: analytics.trackFilesAdded,
+    trackLutApplied: analytics.trackLutApplied,
+    trackVideosProcessed: analytics.trackVideosProcessed,
+    trackDownloadClicked: analytics.trackDownloadClicked,
+    trackFeedbackClicked: analytics.trackFeedbackClicked,
+    trackError: analytics.trackError,
+  },
 
   // ---------------------------------------------------------------------------
   // Cleanup

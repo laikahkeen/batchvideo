@@ -97,11 +97,31 @@ const dialogAPI = {
   selectOutputFolder: (): Promise<string | null> => ipcRenderer.invoke('dialog:selectOutputFolder'),
 };
 
+// Updater API
+const updaterAPI = {
+  checkForUpdates: (): Promise<void> => ipcRenderer.invoke('updater:checkForUpdates'),
+
+  onStatus: (callback: (data: { status: string; version?: string; progress?: number; error?: string }) => void) => {
+    const listener = (_: Electron.IpcRendererEvent, data: { status: string; version?: string; progress?: number; error?: string }) => callback(data);
+    ipcRenderer.on('updater:status', listener);
+    return () => ipcRenderer.removeListener('updater:status', listener);
+  },
+};
+
+// Analytics API
+const analyticsAPI = {
+  track: (event: string, properties?: Record<string, unknown>): void => {
+    ipcRenderer.send('analytics:track', event, properties);
+  },
+};
+
 // Custom APIs for renderer
 const api = {
   ffmpeg: ffmpegAPI,
   file: fileAPI,
   dialog: dialogAPI,
+  updater: updaterAPI,
+  analytics: analyticsAPI,
   platform: process.platform,
   getVersion: (): string => ipcRenderer.sendSync('app:getVersion'),
 };

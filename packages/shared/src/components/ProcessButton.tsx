@@ -111,8 +111,14 @@ const ProcessButton = () => {
       }
     } catch (error) {
       console.error('Error during batch processing:', error);
+      adapter.analytics.trackError('batch_processing', (error as Error).message || 'Unknown error');
       alert('An error occurred during processing. Please try again.');
     } finally {
+      // Track completed videos
+      const completedCount = useVideoStore.getState().files.filter((f) => f.status === 'completed').length;
+      if (completedCount > 0) {
+        adapter.analytics.trackVideosProcessed(completedCount);
+      }
       setProcessing(false);
       setCancelled(false);
     }
@@ -131,6 +137,8 @@ const ProcessButton = () => {
 
   const handleDownloadAll = () => {
     const completedFiles = files.filter((f: VideoFile) => f.status === 'completed' && f.output);
+
+    adapter.analytics.trackDownloadClicked();
 
     completedFiles.forEach((file: VideoFile, index: number) => {
       setTimeout(() => {
