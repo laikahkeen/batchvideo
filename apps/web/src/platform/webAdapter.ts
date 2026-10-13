@@ -356,7 +356,7 @@ export const webAdapter: PlatformAdapter = {
     }
   },
 
-  async cancelProcessing(_jobId: string): Promise<void> {
+  async cancelProcessing(): Promise<void> {
     // FFmpeg.wasm doesn't support cancellation directly
     // We rely on the isCancelled flag in the store
     currentProgressCallback = null;

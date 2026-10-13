@@ -7,6 +7,8 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
+    "check": "turbo run lint typecheck",
+    "audit": "audit-ci --config audit-ci.jsonc",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "clean": "turbo clean && rm -rf node_modules",
     "dev:web": "turbo dev --filter=@batchvideo/web",
@@ -19,8 +21,10 @@
     "typecheck:shared": "turbo typecheck --filter=@workspace/shared"
   },
   "devDependencies": {
-    "turbo": "^2.3.3",
-    "prettier": "^3.7.4",
-    "prettier-plugin-tailwindcss": "^0.7.2"
+    "audit-ci": "^7.1.0",
+    "lefthook": "^2.2.2",
+    "prettier": "^3.9.10",
+    "prettier-plugin-tailwindcss": "^0.7.4",
+    "turbo": "^2.11.7"
   }
 }
