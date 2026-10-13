@@ -1,0 +1,24 @@
+# Standard: https://github.com/laikahkeen/dev-standards
+# ESLint configs are per package, so each job runs from its package root.
+pre-commit:
+  jobs:
+    - name: lint web
+      root: apps/web/
+      glob: '*.{js,mjs,ts,tsx}'
+      run: pnpm exec eslint --no-warn-ignored {staged_files}
+    - name: lint desktop
+      root: apps/desktop/
+      glob: '*.{js,mjs,ts,tsx}'
+      run: pnpm exec eslint --no-warn-ignored {staged_files}
+    - name: lint shared
+      root: packages/shared/
+      glob: '*.{js,mjs,ts,tsx}'
+      run: pnpm exec eslint --no-warn-ignored --max-warnings 0 {staged_files}
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: check
+      run: pnpm run check
+    - name: audit
+      run: pnpm run audit
