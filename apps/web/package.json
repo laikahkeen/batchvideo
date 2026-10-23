@@ -14,7 +14,7 @@
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@workspace/shared": "workspace:*",
-    "posthog-js": "^1.313.0",
+    "posthog-js": "^1.438.19",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
